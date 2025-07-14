@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Order - Abhista Laundry</title>
-<link rel="stylesheet" href="css/style.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Order - Abhista Laundry</title>
+  <link rel="stylesheet" href="css/style.css" />
   <style>
     main {
       padding: 130px 20px 50px; /* ingetin */
@@ -69,47 +69,16 @@
   </style>
 </head>
 <body>
-<header class="navbar">
-<a href="index.html" class="logo">Abhista Laundry</a>
-<nav id="main-nav"></nav>
-</header>
+  <header class="navbar">
+    <a href="index.html" class="logo">Abhista Laundry</a>
+    <button class="hamburger" id="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <nav id="main-nav" class="nav-links"></nav>
+  </header>
 
-  <main class="order-page" style="padding-top: 100px;"> <!-- ingetin -->
-    <h1 class="order-title" style="text-align: center;">Form Pemesanan Antar-Jemput</h1>
-    <form class="order-form" id="orderForm">
-      <label for="nama">Nama</label>
-      <input type="text" id="nama" name="nama" required />
-
-      <label for="nomor">Nomor HP (WA)</label>
-      <input type="tel" id="nomor" name="nomor" required />
-
-      <label for="alamat">Alamat Jemput (Sertakan Link Google Maps)</label>
-      <textarea id="alamat" name="alamat" rows="3" required></textarea>
-
-      <label for="layanan">Jenis Layanan</label>
-      <select id="layanan" name="layanan" required>
-        <option value="">-- Pilih Layanan --</option>
-        <option value="kering">Cuci Kering</option>
-        <option value="setrika">Cuci + Setrika</option>
-        <option value="bedcover">Cuci Bedcover</option>
-      </select>
-
-      <label>Dijemput Kapan?</label>
-      <div class="radio-group">
-        <label><input type="radio" name="waktu" value="sekarang" checked /> Sekarang</label>
-        <label><input type="radio" name="waktu" value="nanti" /> Nanti</label>
-      </div>
-
-      <div id="pilih-jam" style="display: none;">
-        <label for="jam">Pilih Jam Jemput</label>
-        <input type="time" id="jam" name="jam" />
-      </div>
-
-      <label for="catatan">Catatan Tambahan</label>
-      <textarea id="catatan" name="catatan" rows="2"></textarea>
-
-      <button type="submit" class="btn-order">Kirim Pesanan</button>
-    </form>
   <main>
     <div class="order-card">
       <h1>Form Pemesanan Antar-Jemput</h1>
@@ -148,44 +117,56 @@
         <button type="submit" class="btn-order">Kirim Pesanan</button>
       </form>
     </div>
-</main>
+  </main>
 
   <!-- Firebase + Navbar -->
-  <!-- Firebase + Script Dinamis -->
   <script type="module" src="js/navbar.js"></script>
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-const firebaseConfig = {
-apiKey: "AIzaSyAg2mhpdg3DH4fJGm2626_2-ysvsXKHRFg",
-@@ -68,18 +132,15 @@
+    const firebaseConfig = {
+      apiKey: "AIzaSyAg2mhpdg3DH4fJGm2626_2-ysvsXKHRFg",
+      authDomain: "abhista-laundry.firebaseapp.com",
+      databaseURL: "https://abhista-laundry-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "abhista-laundry",
+      storageBucket: "abhista-laundry.appspot.com",
+      messagingSenderId: "784467467337",
+      appId: "1:784467467337:web:c81cb521dc477b8dc07398"
+    };
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-    const auth = getAuth(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-    // Jam muncul hanya jika "nanti" dipilih
     const form = document.getElementById("orderForm");
-const radioNanti = document.querySelector('input[value="nanti"]');
-const radioSekarang = document.querySelector('input[value="sekarang"]');
-const pilihJam = document.getElementById("pilih-jam");
+    const radioNanti = document.querySelector('input[value="nanti"]');
+    const radioSekarang = document.querySelector('input[value="sekarang"]');
+    const pilihJam = document.getElementById("pilih-jam");
 
-radioNanti.addEventListener("change", () => pilihJam.style.display = "block");
-radioSekarang.addEventListener("change", () => pilihJam.style.display = "none");
+    radioNanti.addEventListener("change", () => pilihJam.style.display = "block");
+    radioSekarang.addEventListener("change", () => pilihJam.style.display = "none");
 
-    // Proses Submit
-    const form = document.getElementById("orderForm");
-form.addEventListener("submit", (e) => {
-e.preventDefault();
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const data = {
+        nama: form.nama.value,
+        nomor: form.nomor.value,
+        alamat: form.alamat.value,
+        layanan: form.layanan.value,
+        waktu: form.waktu.value,
+        jam: form.jam.value || "-",
+        catatan: form.catatan.value
+      };
 
-@@ -106,8 +167,5 @@
-});
-});
-</script>
-
-  <!-- Navbar Dinamis -->
-  <script type="module" src="js/navbar.js"></script>
+      push(ref(db, "order/"), data).then(() => {
+        alert("Pesanan berhasil dikirim!");
+        form.reset();
+        pilihJam.style.display = "none";
+      }).catch((err) => {
+        console.error(err);
+        alert("Gagal mengirim pesanan.");
+      });
+    });
+  </script>
 </body>
 </html>
