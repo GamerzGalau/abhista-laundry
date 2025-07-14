@@ -6,110 +6,151 @@
   <title>Pesanan - Abhista Laundry</title>
   <link rel="stylesheet" href="css/style.css" />
   <style>
+    main {
+      padding: 130px 20px 50px;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
     }
+
     th, td {
       padding: 12px;
       border: 1px solid #ccc;
       text-align: left;
     }
+
     th {
       background-color: #4b91f1;
       color: white;
     }
+
     tbody tr:hover {
       background-color: #f2f2f2;
-    }
-    .dashboard-section {
-      padding: 30px;
-      max-width: 1000px;
-      margin: 100px auto;
-    }
-    nav a.active {
-      background-color: #4b91f1;
-      color: white !important;
-      padding: 8px 12px;
-      border-radius: 5px;
     }
   </style>
 </head>
 <body>
   <header class="navbar">
     <a href="index.html" class="logo">Abhista Laundry</a>
-    <nav>
-      <a href="index.html">Beranda</a>
-      <a href="layanan.html">Layanan</a>
-      <a href="order.html">Order</a>
-      <a href="tracking.html">Tracking</a>
-      <a href="pesanan.html" class="active">Pesanan</a>
-      <a href="admin-dashboard.html">Dashboard</a>
-      <a href="#" onclick="logout()" class="login-button">Logout</a>
-    </nav>
+    <nav id="main-nav"></nav>
   </header>
 
-  <main class="dashboard-section">
-    <h1>Data Pesanan Masuk</h1>
+  <main class="container">
+    <h1>Daftar Pesanan Pelanggan</h1>
     <table>
       <thead>
         <tr>
           <th>Nama</th>
-          <th>Nomor</th>
-          <th>Alamat</th>
-          <th>Layanan</th>
-          <th>Jemput</th>
+          <th>Nomor WA</th>
+          <th>Alamat Jemput</th>
+          <th>Jenis Layanan</th>
+          <th>Waktu Jemput</th>
           <th>Catatan</th>
-          <th>Status</th>
         </tr>
       </thead>
       <tbody id="pesanan-body">
-        <tr><td colspan="7">Memuat data...</td></tr>
+        <tr><td colspan="6">Memuat data...</td></tr>
       </tbody>
     </table>
   </main>
 
-  <!-- Cek login -->
-  <script>
-    if (localStorage.getItem("admin") !== "true") {
-      alert("Anda belum login sebagai admin.");
-      window.location.href = "login.html";
-    }
-
-    function logout() {
-      localStorage.removeItem("admin");
-      alert("Logout berhasil!");
-      window.location.href = "index.html";
-    }
-  </script>
-
-  <!-- Firebase data -->
+  <!-- Firebase SDK -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAg2mhpdg3DH4fJGm2626_2-ysvsXKHRFg",
       authDomain: "abhista-laundry.firebaseapp.com",
       projectId: "abhista-laundry",
+      databaseURL: "https://abhista-laundry-default-rtdb.asia-southeast1.firebasedatabase.app/",
       storageBucket: "abhista-laundry.appspot.com",
       messagingSenderId: "784467467337",
       appId: "1:784467467337:web:c81cb521dc477b8dc07398",
-      measurementId: "G-VKB1VZH6BH",
-      databaseURL: "https://abhista-laundry-default-rtdb.asia-southeast1.firebasedatabase.app/"
+      measurementId: "G-VKB1VZH6BH"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    const pesananRef = ref(db, "pesanan/");
+    const auth = getAuth(app);
+
     const tbody = document.getElementById("pesanan-body");
 
-    onValue(pesananRef, (snapshot) => {
-      tbody.innerHTML = "";
-      const data = snapshot.val();
-      if (data) {
-        Object.values(data).forEach((pesan) => {
-          const row = document.createElement("tr");
-          row.innerHTML = `
-            <td>${pesan.nam
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        const pesananRef = ref(db, "pesanan/");
+        onValue(pesananRef, (snapshot) => {
+          const data = snapshot.val();
+          tbody.innerHTML = "";
+
+          if (data) {
+            Object.values(data).forEach((pesan) => {
+              const row = document.createElement("tr");
+              row.innerHTML = `
+                <td>${pesan.nama}</td>
+                <td>${pesan.nomor}</td>
+                <td><a href="${pesan.gmaps}" target="_blank">${pesan.alamat}</a></td>
+                <td>${pesan.layanan}</td>
+                <td>${pesan.waktu === "nanti" ? pesan.waktu + " - " + pesan.jam : "sekarang"}</td>
+                <td>${pesan.catatan || "-"}</td>
+              `;
+              tbody.appendChild(row);
+            });
+          } else {
+            tbody.innerHTML = `<tr><td colspan="6">Belum ada pesanan masuk.</td></tr>`;
+          }
+        });
+      } else {
+        alert("Halaman ini hanya untuk admin. Silakan login terlebih dahulu.");
+        window.location.href = "login.html";
+      }
+    });
+  </script>
+
+  <!-- Navbar dinamis -->
+  <script>
+    const nav = document.getElementById("main-nav");
+    const currentPage = window.location.pathname.split("/").pop();
+    const isAdmin = !!localStorage.getItem("admin");
+
+    const menuItems = [
+      { href: "index.html", label: "Beranda" },
+      { href: "layanan.html", label: "Layanan" },
+      { href: "order.html", label: "Order" },
+      { href: "tracking.html", label: "Tracking" },
+      ...(isAdmin
+        ? [
+            { href: "pesanan.html", label: "Pesanan" },
+            { href: "admin-dashboard.html", label: "Dashboard" },
+            { href: "#", label: "Logout", isLogout: true }
+          ]
+        : [{ href: "login.html", label: "Login Admin", isLogin: true }])
+    ];
+
+    nav.innerHTML = menuItems.map(item => {
+      if (item.isLogout) {
+        return `<a href="#" class="login-button" onclick="logout()">Logout</a>`;
+      }
+      if (item.isLogin) {
+        return `<a href="${item.href}" class="login-button ${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
+      }
+      return `<a href="${item.href}" class="${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
+    }).join("");
+
+    function logout() {
+      localStorage.removeItem("admin");
+      import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js").then(({ getAuth, signOut }) => {
+        const auth = getAuth();
+        signOut(auth).then(() => {
+          alert("Logout berhasil!");
+          window.location.href = "index.html";
+        });
+      });
+    }
+  </script>
+</body>
+</html>
