@@ -414,58 +414,38 @@ nav a.active {
   padding: 8px 15px;
 }
 
-/* Hamburger Button */
+/* Tombol hamburger disembunyikan di desktop */
 .hamburger {
   display: none;
   font-size: 24px;
-  background: none;
-  border: none;
   cursor: pointer;
-  color: #4b91f1;
-  z-index: 110;
 }
 
-/* Menu Default di Mobile: Sembunyi */
-nav.hidden {
-  display: none;
-}
-
-/* Menu Tampil Saat Aktif */
-nav.show {
-  display: flex;
-  flex-direction: column;
-  position: absolute;
-  top: 70px;
-  right: 20px;
-  background-color: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-}
-
-nav.show a {
-  margin: 10px 0;
-}
-
-/* Responsive Rules */
+/* Tampilkan hamburger hanya di layar kecil */
 @media (max-width: 768px) {
   .hamburger {
     display: block;
   }
 
-  .navbar {
-    position: relative;
-  }
-
-  nav {
-    position: absolute;
-    right: 0;
-    top: 70px;
+  nav.nav-links {
+    display: none;
     flex-direction: column;
-    align-items: flex-start;
+    position: absolute;
+    top: 70px; /* di bawah navbar */
+    right: 20px;
+    background-color: white;
+    border-radius: 6px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 10px 20px;
+    z-index: 999;
   }
 
-  nav a {
+  nav.nav-links.active {
+    display: flex;
+  }
+
+  nav.nav-links a {
     margin: 10px 0;
+    display: block;
   }
 }
