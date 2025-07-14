@@ -2,8 +2,8 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Abhista Laundry</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Beranda - Abhista Laundry</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -15,12 +15,12 @@
   <main class="background-image">
     <div class="hero-box">
       <h1>Selamat Datang di Abhista Laundry</h1>
-      <p>Kami melayani jasa laundry antar-jemput cepat, bersih, dan terpercaya.</p>
-      <a href="layanan.html" class="start-button">Mulai</a>
+      <p>Kami siap menjemput dan mengantar cucian Anda dengan layanan cepat dan terpercaya.</p>
+      <a href="order.html" class="start-button">Mulai Sekarang</a>
     </div>
   </main>
 
-  <!-- Script Dinamis Navbar + Firebase Auth -->
+  <!-- Firebase -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -31,11 +31,13 @@
       projectId: "abhista-laundry",
       storageBucket: "abhista-laundry.appspot.com",
       messagingSenderId: "784467467337",
-      appId: "1:784467467337:web:c81cb521dc477b8dc07398"
+      appId: "1:784467467337:web:c81cb521dc477b8dc07398",
+      measurementId: "G-VKB1VZH6BH"
     };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+
     const nav = document.getElementById("main-nav");
     const currentPage = window.location.pathname.split("/").pop();
 
@@ -48,36 +50,36 @@
         { href: "tracking.html", label: "Tracking" },
         ...(isAdmin
           ? [
-              { href: "pesanan.html", label: "Pesanan" },
               { href: "admin-dashboard.html", label: "Dashboard" },
+              { href: "pesanan.html", label: "Pesanan" },
               { href: "#", label: "Logout", isLogout: true }
             ]
           : [{ href: "login.html", label: "Login Admin", isLogin: true }])
       ];
 
-      nav.innerHTML = menuItems
-        .map((item) => {
-          if (item.isLogout) {
-            return `<a href="#" class="login-button" onclick="logout()">Logout</a>`;
-          }
-          if (item.isLogin) {
-            return `<a href="${item.href}" class="login-button ${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
-          }
-          return `<a href="${item.href}" class="${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
-        })
-        .join("");
+      nav.innerHTML = menuItems.map(item => {
+        if (item.isLogout) {
+          return `<a href="#" class="login-button" onclick="logout()">Logout</a>`;
+        }
+        if (item.isLogin) {
+          return `<a href="${item.href}" class="login-button ${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
+        }
+        return `<a href="${item.href}" class="${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
+      }).join("");
     });
 
-    function logout() {
+    window.logout = function () {
       signOut(auth)
         .then(() => {
           alert("Logout berhasil!");
-          window.location.href = "index.html";
+          setTimeout(() => {
+            window.location.href = "index.html";
+          }, 100);
         })
         .catch((error) => {
-          console.error("Logout error:", error);
+          alert("Gagal logout: " + error.message);
         });
-    }
+    };
   </script>
 </body>
 </html>
