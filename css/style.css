@@ -417,14 +417,27 @@ nav a.active {
 /* Tombol hamburger disembunyikan di desktop */
 .hamburger {
   display: none;
-  font-size: 24px;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 25px;
+  height: 18px;
+  background: transparent;
+  border: none;
   cursor: pointer;
+  padding: 0;
+  z-index: 1001;
 }
-
+.hamburger span {
+  height: 3px;
+  width: 100%;
+  background-color: #4b91f1;
+  border-radius: 2px;
+  transition: 0.3s ease;
+  
 /* Tampilkan hamburger hanya di layar kecil */
 @media (max-width: 768px) {
   .hamburger {
-    display: block;
+    display: flex;
   }
 
   nav.nav-links {
