@@ -1,10 +1,27 @@
 // navbar.js
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
+// Konfigurasi Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyAg2mhpdg3DH4fJGm2626_2-ysvsXKHRFg",
+  authDomain: "abhista-laundry.firebaseapp.com",
+  projectId: "abhista-laundry",
+  storageBucket: "abhista-laundry.appspot.com",
+  messagingSenderId: "784467467337",
+  appId: "1:784467467337:web:c81cb521dc477b8dc07398",
+  databaseURL: "https://abhista-laundry-default-rtdb.asia-southeast1.firebasedatabase.app"
+};
+
+// Inisialisasi Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// Target nav
 const nav = document.getElementById("main-nav");
 const currentPage = window.location.pathname.split("/").pop();
-const auth = getAuth();
 
+// Fungsi render menu dinamis
 function renderNavbar(isLoggedIn) {
   const menuItems = [
     { href: "index.html", label: "Beranda" },
@@ -31,10 +48,12 @@ function renderNavbar(isLoggedIn) {
   }).join("");
 }
 
+// Deteksi status login
 onAuthStateChanged(auth, (user) => {
   renderNavbar(!!user);
 });
 
+// Fungsi logout
 window.logout = function () {
   signOut(auth).then(() => {
     alert("Logout berhasil!");
