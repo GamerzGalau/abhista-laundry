@@ -3,8 +3,41 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Tracking - Abhista Laundry</title>
+  <title>Tracking Laundry - Abhista Laundry</title>
   <link rel="stylesheet" href="css/style.css" />
+  <style>
+    main {
+      padding: 130px 20px 50px; /* ingetin */
+      background-color: #f0f4f8;
+      min-height: 100vh;
+    }
+
+    .card-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .tracking-card {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      width: 300px;
+    }
+
+    .tracking-card h3 {
+      color: #4b91f1;
+      margin-bottom: 10px;
+    }
+
+    .tracking-card p {
+      font-size: 14px;
+      color: #444;
+      margin: 4px 0;
+    }
+  </style>
 </head>
 <body>
   <header class="navbar">
@@ -12,14 +45,16 @@
     <nav id="main-nav"></nav>
   </header>
 
-  <main class="tracking-page" style="padding-top: 130px;">
-    <h1 class="order-title">Tracking Laundry</h1>
-    <div id="tracking-list" class="tracking-list"></div>
+  <main>
+    <h1 style="text-align: center; margin-bottom: 30px;">Status Laundry Pelanggan</h1>
+    <div class="card-container" id="tracking-list">
+      <!-- Data tracking muncul di sini -->
+    </div>
   </main>
 
-  <!-- Firebase SDK -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
     const firebaseConfig = {
@@ -33,67 +68,81 @@
     };
 
     const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
     const db = getDatabase(app);
 
-    const trackingList = document.getElementById("tracking-list");
-    const trackingRef = ref(db, "tracking/");
+    const list = document.getElementById("tracking-list");
 
-    onValue(trackingRef, (snapshot) => {
-      trackingList.innerHTML = "";
-      const data = snapshot.val();
-
-      if (data) {
-        Object.entries(data).forEach(([id, item]) => {
-          const card = document.createElement("div");
-          card.className = "tracking-card";
-          card.innerHTML = `
-            <h3>${item.nama}</h3>
-            <p><strong>Layanan:</strong> ${item.layanan}</p>
-            <p><strong>Status:</strong> ${item.status}</p>
-            <p><strong>Harga:</strong> ${item.harga ? "Rp" + item.harga : "-"}</p>
-          `;
-          trackingList.appendChild(card);
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const trackingRef = ref(db, "tracking/");
+        onValue(trackingRef, (snapshot) => {
+          list.innerHTML = "";
+          const data = snapshot.val();
+          if (data) {
+            Object.values(data).forEach(item => {
+              const card = document.createElement("div");
+              card.classList.add("tracking-card");
+              card.innerHTML = `
+                <h3>${item.nama}</h3>
+                <p><strong>Layanan:</strong> ${item.layanan}</p>
+                <p><strong>Status:</strong> ${item.status}</p>
+                <p><strong>Harga:</strong> ${item.harga || '-'}</p>
+              `;
+              list.appendChild(card);
+            });
+          } else {
+            list.innerHTML = "<p>Tidak ada data tracking.</p>";
+          }
         });
       } else {
-        trackingList.innerHTML = "<p>Belum ada data tracking tersedia.</p>";
+        alert("Hanya admin yang dapat melihat halaman ini!");
+        window.location.href = "login.html";
       }
     });
   </script>
 
-  <!-- Navbar dinamis -->
   <script>
+    // Navbar Dinamis
     const nav = document.getElementById("main-nav");
-    const isAdmin = localStorage.getItem("admin") === "true";
     const currentPage = window.location.pathname.split("/").pop();
 
-    const menuItems = [
-      { href: "index.html", label: "Beranda" },
-      { href: "layanan.html", label: "Layanan" },
-      { href: "order.html", label: "Order" },
-      { href: "tracking.html", label: "Tracking" },
-      ...(isAdmin
-        ? [
-            { href: "admin-dashboard.html", label: "Dashboard" },
-            { href: "pesanan.html", label: "Pesanan" },
-            { href: "#", label: "Logout", isLogout: true }
-          ]
-        : [{ href: "login.html", label: "Login Admin", isLogin: true }])
-    ];
+    import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js").then(({ getAuth, onAuthStateChanged }) => {
+      const auth = getAuth();
+      onAuthStateChanged(auth, (user) => {
+        const menuItems = [
+          { href: "index.html", label: "Beranda" },
+          { href: "layanan.html", label: "Layanan" },
+          { href: "order.html", label: "Order" },
+          { href: "tracking.html", label: "Tracking" },
+        ];
 
-    nav.innerHTML = menuItems.map(item => {
-      if (item.isLogout) {
-        return `<a href="#" class="login-button" onclick="logout()">Logout</a>`;
-      }
-      if (item.isLogin) {
-        return `<a href="${item.href}" class="login-button ${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
-      }
-      return `<a href="${item.href}" class="${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
-    }).join("");
+        if (user) {
+          menuItems.push({ href: "pesanan.html", label: "Pesanan" });
+          menuItems.push({ href: "admin-dashboard.html", label: "Dashboard" });
+          menuItems.push({ href: "#", label: "Logout", isLogout: true });
+        } else {
+          menuItems.push({ href: "login.html", label: "Login Admin", isLogin: true });
+        }
+
+        nav.innerHTML = menuItems.map(item => {
+          if (item.isLogout) {
+            return `<a href="#" class="login-button" onclick="logout()">Logout</a>`;
+          }
+          const activeClass = currentPage === item.href ? "active" : "";
+          return `<a href="${item.href}" class="${item.isLogin ? 'login-button' : ''} ${activeClass}">${item.label}</a>`;
+        }).join("");
+      });
+    });
 
     function logout() {
-      localStorage.removeItem("admin");
-      alert("Logout berhasil!");
-      window.location.href = "index.html";
+      import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js").then(({ getAuth, signOut }) => {
+        const auth = getAuth();
+        signOut(auth).then(() => {
+          alert("Logout berhasil!");
+          window.location.href = "index.html";
+        });
+      });
     }
   </script>
 </body>
