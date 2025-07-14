@@ -63,6 +63,8 @@ window.logout = function () {
 
 // Hamburger toggle (mobile)
 const hamburger = document.getElementById("hamburger");
-hamburger.addEventListener("click", () => {
-  nav.classList.toggle("active");
-});
+if (hamburger) {
+  hamburger.addEventListener("click", () => {
+    nav.classList.toggle("active");
+  });
+}
