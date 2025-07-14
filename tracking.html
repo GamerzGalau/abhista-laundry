@@ -80,8 +80,6 @@
 
     const list = document.getElementById("tracking-list");
 
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
         const trackingRef = ref(db, "tracking/");
         onValue(trackingRef, (snapshot) => {
           list.innerHTML = "";
