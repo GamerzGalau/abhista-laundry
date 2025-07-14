@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pesanan - Abhista Laundry</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 12px;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+    th {
+      background-color: #4b91f1;
+      color: white;
+    }
+    tbody tr:hover {
+      background-color: #f2f2f2;
+    }
+    .dashboard-section {
+      padding: 30px;
+      max-width: 1000px;
+      margin: 100px auto;
+    }
+    nav a.active {
+      background-color: #4b91f1;
+      color: white !important;
+      padding: 8px 12px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <header class="navbar">
+    <a href="index.html" class="logo">Abhista Laundry</a>
+    <nav>
+      <a href="index.html">Beranda</a>
+      <a href="layanan.html">Layanan</a>
+      <a href="order.html">Order</a>
+      <a href="tracking.html">Tracking</a>
+      <a href="pesanan.html" class="active">Pesanan</a>
+      <a href="admin-dashboard.html">Dashboard</a>
+      <a href="#" onclick="logout()" class="login-button">Logout</a>
+    </nav>
+  </header>
+
+  <main class="dashboard-section">
+    <h1>Data Pesanan Masuk</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Nama</th>
+          <th>Nomor</th>
+          <th>Alamat</th>
+          <th>Layanan</th>
+          <th>Jemput</th>
+          <th>Catatan</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="pesanan-body">
+        <tr><td colspan="7">Memuat data...</td></tr>
+      </tbody>
+    </table>
+  </main>
+
+  <!-- Cek login -->
+  <script>
+    if (localStorage.getItem("admin") !== "true") {
+      alert("Anda belum login sebagai admin.");
+      window.location.href = "login.html";
+    }
+
+    function logout() {
+      localStorage.removeItem("admin");
+      alert("Logout berhasil!");
+      window.location.href = "index.html";
+    }
+  </script>
+
+  <!-- Firebase data -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAg2mhpdg3DH4fJGm2626_2-ysvsXKHRFg",
+      authDomain: "abhista-laundry.firebaseapp.com",
+      projectId: "abhista-laundry",
+      storageBucket: "abhista-laundry.appspot.com",
+      messagingSenderId: "784467467337",
+      appId: "1:784467467337:web:c81cb521dc477b8dc07398",
+      measurementId: "G-VKB1VZH6BH",
+      databaseURL: "https://abhista-laundry-default-rtdb.asia-southeast1.firebasedatabase.app/"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const pesananRef = ref(db, "pesanan/");
+    const tbody = document.getElementById("pesanan-body");
+
+    onValue(pesananRef, (snapshot) => {
+      tbody.innerHTML = "";
+      const data = snapshot.val();
+      if (data) {
+        Object.values(data).forEach((pesan) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${pesan.nam

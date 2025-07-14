@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tracking - Abhista Laundry</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .tracking-page {
+      padding: 130px 20px 50px;
+      background-color: #f0f4f8;
+      min-height: 100vh;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .tracking-title {
+      font-size: 32px;
+      text-align: center;
+      color: #333;
+      margin-bottom: 30px;
+    }
+
+    .card-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .tracking-card {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      width: 300px;
+    }
+
+    .tracking-card h3 {
+      color: #4b91f1;
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+
+    .tracking-card p {
+      margin: 4px 0;
+      font-size: 14px;
+      color: #444;
+    }
+
+    @media (max-width: 768px) {
+      .tracking-card {
+        width: 90%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="navbar">
+    <a href="index.html" class="logo">Abhista Laundry</a>
+    <nav id="main-nav"></nav>
+  </header>
+
+  <main class="tracking-page">
+    <h1 class="tracking-title">Status Laundry Anda</h1>
+    <div class="card-container" id="tracking-container">
+      <p style="text-align:center; width:100%">Memuat data tracking...</p>
+    </div>
+  </main>
+
+  <script>
+    const nav = document.getElementById("main-nav");
+    const isAdmin = localStorage.getItem("admin") === "true";
+    const currentPage = window.location.pathname.split("/").pop();
+
+    const menuItems = [
+      { href: "index.html", label: "Beranda" },
+      { href: "layanan.html", label: "Layanan" },
+      { href: "order.html", label: "Order" },
+      { href: "tracking.html", label: "Tracking" },
+      ...(isAdmin
+        ? [
+            { href: "admin-dashboard.html", label: "Dashboard" },
+            { href: "#", label: "Logout", isLogout: true }
+          ]
+        : [{ href: "login.html", label: "Login Admin", isLogin: true }])
+    ];
+
+    nav.innerHTML = menuItems.map(item => {
+      if (item.isLogout) {
+        return `<a href="#" class="login-button" onclick="logout()">Logout</a>`;
+      }
+      if (item.isLogin) {
+        return `<a href="${item.href}" class="login-button ${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
+      }
+      return `<a href="${item.href}" class="${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
+    }).join("");
+
+    function logout() {
+      localStorage.removeItem("admin");
+      alert("Logout berhasil!");
+      window.location.href = "index.html";
+    }
+  </script>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAg2mhpdg3DH4fJGm2626_2-ysvsXKHRFg",
+      authDomain: "abhista-laundry.firebaseapp.com",
+      projectId: "abhista-laundry",
+      storageBucket: "abhista-laundry.appspot.com",
+      messagingSenderId: "784467467337",
+      appId: "1:784467467337:web:c81cb521dc477b8dc07398",
+      measurementId: "G-VKB1VZH6BH",
+      databaseURL: "https://abhista-laundry-default-rtdb.asia-southeast1.firebasedatabase.app/"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const trackingRef = ref(db, "tracking/");
+    const container = document.getElementById("tracking-container");
+
+    onValue(trackingRef, (snapshot) => {
+      container.innerHTML = "";
+      const data = snapshot.val();
+      if (data) {
+        Object.values(data).forEach((item) => {
+          const card = document.createElement("div");
+          card.className = "tracking-card";
+          card.innerHTML = `
+            <h3>${item.nama}</h3>
+            <p><strong>Layanan:</strong> ${item.layanan}</p>
+            <p><strong>Status:</strong> ${item.status}</p>
+            <p><strong>Catatan:</strong> ${item.catatan || "-"}</p>
+          `;
+          container.appendChild(card);
+        });
+      } else {
+        container.innerHTML = `<p style="text-align:center; width:100%">Belum ada data tracking.</p>`;
+      }
+    });
+  </script>
+</body>
+</html>

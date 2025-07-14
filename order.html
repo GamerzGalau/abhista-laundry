@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Order - Abhista Laundry</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="navbar">
+  <a href="index.html" class="logo">Abhista Laundry</a>
+  <nav id="main-nav"></nav>
+</header>
+
+  <main class="order-page">
+    <h1 class="order-title">Form Pemesanan Antar-Jemput</h1>
+    <form class="order-form" id="orderForm">
+      <label for="nama">Nama</label>
+      <input type="text" id="nama" name="nama" required />
+
+      <label for="nomor">Nomor HP (WA)</label>
+      <input type="tel" id="nomor" name="nomor" required />
+
+      <label for="alamat">Alamat Jemput (Sertakan Link Google Maps)</label>
+      <textarea id="alamat" name="alamat" rows="3" required></textarea>
+
+      <label for="layanan">Jenis Layanan</label>
+      <select id="layanan" name="layanan" required>
+        <option value="">-- Pilih Layanan --</option>
+        <option value="kering">Cuci Kering</option>
+        <option value="setrika">Cuci + Setrika</option>
+        <option value="bedcover">Cuci Bedcover</option>
+      </select>
+
+      <label>Dijemput Kapan?</label>
+      <div class="radio-group">
+        <label><input type="radio" name="waktu" value="sekarang" checked /> Sekarang</label>
+        <label><input type="radio" name="waktu" value="nanti" /> Nanti</label>
+      </div>
+
+      <div id="pilih-jam" style="display: none;">
+        <label for="jam">Pilih Jam Jemput</label>
+        <input type="time" id="jam" name="jam" />
+      </div>
+
+      <label for="catatan">Catatan Tambahan</label>
+      <textarea id="catatan" name="catatan" rows="2"></textarea>
+
+      <button type="submit" class="btn-order">Kirim Pesanan</button>
+    </form>
+  </main>
+
+  <!-- Firebase Order Script -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAg2mhpdg3DH4fJGm2626_2-ysvsXKHRFg",
+      authDomain: "abhista-laundry.firebaseapp.com",
+      projectId: "abhista-laundry",
+      storageBucket: "abhista-laundry.appspot.com",
+      messagingSenderId: "784467467337",
+      appId: "1:784467467337:web:c81cb521dc477b8dc07398",
+      measurementId: "G-VKB1VZH6BH",
+      databaseURL: "https://abhista-laundry-default-rtdb.asia-southeast1.firebasedatabase.app/"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const form = document.getElementById("orderForm");
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const data = {
+        nama: form.nama.value,
+        nomor: form.nomor.value,
+        alamat: form.alamat.value,
+        layanan: form.layanan.value,
+        waktu: form.waktu.value,
+        jam: form.waktu.value === "nanti" ? form.jam.value : "",
+        catatan: form.catatan.value || "-",
+        status: "Belum Dijemput"
+      };
+
+      const pesananRef = ref(db, "pesanan/");
+      push(pesananRef, data)
+        .then(() => {
+          alert("Pesanan berhasil dikirim!");
+          form.reset();
+          document.getElementById("pilih-jam").style.display = "none";
+        })
+        .catch((error) => {
+          alert("Gagal mengirim pesanan: " + error.message);
+          console.error(error);
+        });
+    });
+
+    // Show jam jemput jika pilih "nanti"
+    document.querySelectorAll('input[name="waktu"]').forEach((el) => {
+      el.addEventListener("change", () => {
+        document.getElementById("pilih-jam").style.display = el.value === "nanti" ? "block" : "none";
+      });
+    });
+  </script>
+
+  <!-- Navbar Dinamis -->
+  <script>
+  const nav = document.getElementById("main-nav");
+  const isAdmin = localStorage.getItem("admin") === "true";
+  const currentPage = window.location.pathname.split("/").pop();
+
+  const menuItems = [
+    { href: "index.html", label: "Beranda" },
+    { href: "layanan.html", label: "Layanan" },
+    { href: "order.html", label: "Order" },
+    { href: "tracking.html", label: "Tracking" },
+    ...(isAdmin
+      ? [
+          { href: "admin-dashboard.html", label: "Dashboard" },
+          { href: "#", label: "Logout", isLogout: true }
+        ]
+      : [{ href: "login.html", label: "Login Admin", isLogin: true }])
+  ];
+
+  nav.innerHTML = menuItems.map(item => {
+    if (item.isLogout) {
+      return `<a href="#" class="login-button" onclick="logout()">Logout</a>`;
+    }
+    if (item.isLogin) {
+      return `<a href="${item.href}" class="login-button ${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
+    }
+    return `<a href="${item.href}" class="${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
+  }).join("");
+
+  function logout() {
+    localStorage.removeItem("admin");
+    alert("Logout berhasil!");
+    window.location.href = "index.html";
+  }
+  </script>
+
+</body>
+</html>

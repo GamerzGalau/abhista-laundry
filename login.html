@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login Admin - Abhista Laundry</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="navbar">
+    <a href="index.html" class="logo">Abhista Laundry</a>
+    <nav></nav> <!-- Navbar kosong, diisi lewat JS -->
+  </header>
+
+  <main class="order-page">
+    <h1 class="order-title">Login Admin</h1>
+    <form class="order-form" id="loginForm">
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" required />
+
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" required />
+
+      <button type="submit" class="btn-order">Masuk</button>
+    </form>
+  </main>
+
+  <!-- Script Login -->
+  <script>
+    const form = document.getElementById("loginForm");
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+
+      if (username === "admin" && password === "abhista123") {
+        localStorage.setItem("admin", "true");
+        alert("Login berhasil!");
+        window.location.href = "admin-dashboard.html";
+      } else {
+        alert("Username atau password salah!");
+      }
+    });
+  </script>
+
+  <!-- Script Navbar Dinamis -->
+  <script>
+    const nav = document.querySelector("nav");
+
+    const isAdmin = localStorage.getItem("admin") === "true";
+    if (isAdmin) {
+      nav.innerHTML = `
+        <a href="index.html">Beranda</a>
+        <a href="tracking.html">Tracking</a>
+        <a href="admin-dashboard.html">Dashboard</a>
+        <a href="#" onclick="logout()" class="login-button">Logout</a>
+      `;
+    } else {
+      nav.innerHTML = `
+        <a href="index.html">Beranda</a>
+        <a href="layanan.html">Layanan</a>
+        <a href="order.html">Order</a>
+        <a href="tracking.html">Tracking</a>
+        <a href="login.html" class="login-button">Login Admin</a>
+      `;
+    }
+
+    function logout() {
+      localStorage.removeItem("admin");
+      alert("Logout berhasil!");
+      window.location.href = "index.html";
+    }
+  </script>
