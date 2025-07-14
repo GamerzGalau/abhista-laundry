@@ -5,55 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dashboard Admin - Abhista Laundry</title>
   <link rel="stylesheet" href="css/style.css" />
-  <style>
-    .container {
-      padding: 20px;
-    }
-    .card {
-      background-color: #fff;
-      padding: 20px;
-      margin-top: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.1);
-    }
-    .card h2 {
-      margin-top: 0;
-    }
-    .form-group {
-      margin-bottom: 15px;
-    }
-    .form-group label {
-      display: block;
-      font-weight: bold;
-    }
-    .form-group input, .form-group select {
-      width: 100%;
-      padding: 8px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-    th, td {
-      padding: 10px;
-      border: 1px solid #ccc;
-    }
-    th {
-      background-color: #4b91f1;
-      color: white;
-    }
-    .action-btn {
-      padding: 5px 10px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .edit-btn { background-color: #ffcc00; }
-    .delete-btn { background-color: #ff4444; color: white; }
-  </style>
 </head>
 <body>
   <header class="navbar">
@@ -61,41 +12,42 @@
     <nav id="main-nav"></nav>
   </header>
 
-  <main class="container">
+  <main style="padding: 130px 20px 50px;">
     <h1>Dashboard Admin</h1>
 
-    <!-- Input Tracking (Card) -->
-    <div class="card">
-      <h2>Input Tracking</h2>
-      <div class="form-group">
-        <label for="trackingNama">Nama</label>
-        <input type="text" id="trackingNama" placeholder="Masukkan nama pelanggan">
-      </div>
-      <div class="form-group">
-        <label for="trackingLayanan">Layanan</label>
-        <select id="trackingLayanan">
+    <!-- Kartu Input Tracking -->
+    <section class="tracking-card">
+      <h2>Input Data Tracking</h2>
+      <form id="formTracking">
+        <label>Nama Pelanggan</label>
+        <input type="text" id="nama" required />
+
+        <label>Jenis Layanan</label>
+        <select id="layanan" required>
           <option value="">-- Pilih Layanan --</option>
-          <option value="kering">Cuci Kering</option>
-          <option value="setrika">Cuci + Setrika</option>
-          <option value="bedcover">Cuci Bedcover</option>
+          <option value="Cuci Kering">Cuci Kering</option>
+          <option value="Cuci + Setrika">Cuci + Setrika</option>
+          <option value="Bedcover">Bedcover</option>
         </select>
-      </div>
-      <div class="form-group">
-        <label for="trackingStatus">Status</label>
-        <select id="trackingStatus">
+
+        <label>Status</label>
+        <select id="status" required>
           <option value="">-- Pilih Status --</option>
           <option value="Belum Dijemput">Belum Dijemput</option>
-          <option value="Sedang Diproses">Sedang Diproses</option>
+          <option value="Sudah Dijemput">Sudah Dijemput</option>
+          <option value="Dicuci">Dicuci</option>
+          <option value="Disetrika">Disetrika</option>
           <option value="Dilipat">Dilipat</option>
           <option value="Selesai">Selesai</option>
         </select>
-      </div>
-      <button class="action-btn" style="background:#4b91f1; color:white;" id="simpanTracking">Simpan Tracking</button>
-    </div>
 
-    <!-- Tracking Tersimpan (Table) -->
-    <div class="card">
-      <h2>Edit Tracking</h2>
+        <button type="submit" class="btn-order">Tambahkan</button>
+      </form>
+    </section>
+
+    <!-- Daftar Tracking -->
+    <section style="margin-top: 40px;">
+      <h2>Edit Tracking Laundry</h2>
       <table>
         <thead>
           <tr>
@@ -105,145 +57,200 @@
             <th>Aksi</th>
           </tr>
         </thead>
-        <tbody id="trackingTableBody">
-          <!-- Data tracking muncul di sini -->
-        </tbody>
+        <tbody id="trackingBody"></tbody>
       </table>
-    </div>
+    </section>
   </main>
 
-  <!-- Firebase & Script -->
+  <!-- Firebase + Navbar Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      getDatabase,
+      ref,
+      push,
+      onValue,
+      remove,
+      update
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAg2mhpdg3DH4fJGm2626_2-ysvsXKHRFg",
       authDomain: "abhista-laundry.firebaseapp.com",
+      databaseURL: "https://abhista-laundry-default-rtdb.asia-southeast1.firebasedatabase.app",
       projectId: "abhista-laundry",
       storageBucket: "abhista-laundry.appspot.com",
       messagingSenderId: "784467467337",
-      appId: "1:784467467337:web:c81cb521dc477b8dc07398",
-      databaseURL: "https://abhista-laundry-default-rtdb.asia-southeast1.firebasedatabase.app/"
+      appId: "1:784467467337:web:c81cb521dc477b8dc07398"
     };
 
     const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
     const db = getDatabase(app);
-    const auth = getAuth();
 
-    const namaInput = document.getElementById("trackingNama");
-    const layananInput = document.getElementById("trackingLayanan");
-    const statusInput = document.getElementById("trackingStatus");
-    const btnSimpan = document.getElementById("simpanTracking");
-    const tbody = document.getElementById("trackingTableBody");
-
-    let editingId = null;
-
-    onAuthStateChanged(auth, user => {
-      if (!user) {
-        alert("Silakan login sebagai admin terlebih dahulu.");
-        window.location.href = "login.html";
-      }
-    });
-
-    function loadTracking() {
-      const trackingRef = ref(db, "tracking/");
-      onValue(trackingRef, snapshot => {
-        tbody.innerHTML = "";
-        const data = snapshot.val();
-        if (data) {
-          Object.entries(data).forEach(([id, item]) => {
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-              <td>${item.nama}</td>
-              <td>${item.layanan}</td>
-              <td>${item.status}</td>
-              <td>
-                <button class="action-btn edit-btn" onclick="editTracking('${id}', '${item.nama}', '${item.layanan}', '${item.status}')">Edit</button>
-                <button class="action-btn delete-btn" onclick="hapusTracking('${id}')">Hapus</button>
-              </td>`;
-            tbody.appendChild(tr);
-          });
-        }
-      });
-    }
-
-    btnSimpan.addEventListener("click", () => {
-      const nama = namaInput.value.trim();
-      const layanan = layananInput.value;
-      const status = statusInput.value;
-      if (!nama || !layanan || !status) return alert("Lengkapi semua kolom!");
-
-      const data = { nama, layanan, status };
-      const refPath = ref(db, "tracking/");
-      if (editingId) {
-        update(ref(db, `tracking/${editingId}`), data);
-        editingId = null;
-      } else {
-        push(refPath, data);
-      }
-      namaInput.value = "";
-      layananInput.value = "";
-      statusInput.value = "";
-    });
-
-    window.editTracking = function (id, nama, layanan, status) {
-      editingId = id;
-      namaInput.value = nama;
-      layananInput.value = layanan;
-      statusInput.value = status;
-    };
-
-    window.hapusTracking = function (id) {
-      if (confirm("Hapus tracking ini?")) {
-        remove(ref(db, `tracking/${id}`));
-      }
-    };
-
-    loadTracking();
-  </script>
-
-  <!-- Navbar Dinamis -->
-  <script>
+    // Navbar Dinamis
     const nav = document.getElementById("main-nav");
     const currentPage = window.location.pathname.split("/").pop();
-    const isLoggedIn = localStorage.getItem("admin") === "true" || sessionStorage.getItem("adminFirebase") === "true";
 
-    const menuItems = [
-      { href: "index.html", label: "Beranda" },
-      { href: "layanan.html", label: "Layanan" },
-      { href: "order.html", label: "Order" },
-      { href: "tracking.html", label: "Tracking" },
-      { href: "pesanan.html", label: "Pesanan" },
-      ...(isLoggedIn
-        ? [
-            { href: "admin-dashboard.html", label: "Dashboard" },
-            { href: "#", label: "Logout", isLogout: true }
-          ]
-        : [{ href: "login.html", label: "Login Admin", isLogin: true }])
-    ];
+    const renderNavbar = (isLoggedIn) => {
+      const menu = [
+        { href: "index.html", label: "Beranda" },
+        { href: "layanan.html", label: "Layanan" },
+        { href: "order.html", label: "Order" },
+        { href: "tracking.html", label: "Tracking" },
+        ...(isLoggedIn
+          ? [
+              { href: "admin-dashboard.html", label: "Dashboard" },
+              { href: "pesanan.html", label: "Pesanan" },
+              { href: "#", label: "Logout", isLogout: true }
+            ]
+          : [{ href: "login.html", label: "Login Admin", isLogin: true }])
+      ];
 
-    nav.innerHTML = menuItems.map(item => {
-      if (item.isLogout) {
-        return `<a href="#" class="login-button" onclick="logout()">Logout</a>`;
+      nav.innerHTML = menu
+        .map(item => {
+          if (item.isLogout) {
+            return `<a href="#" class="login-button" onclick="logout()">Logout</a>`;
+          }
+          const active = currentPage === item.href ? 'active' : '';
+          return `<a href="${item.href}" class="${item.isLogin ? 'login-button' : ''} ${active}">${item.label}</a>`;
+        })
+        .join("");
+    };
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        renderNavbar(true);
+      } else {
+        renderNavbar(false);
+        // Redirect non-admin
+        if (!window.location.href.includes("login.html")) {
+          window.location.href = "login.html";
+        }
       }
-      if (item.isLogin) {
-        return `<a href="${item.href}" class="login-button ${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
-      }
-      return `<a href="${item.href}" class="${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
-    }).join("");
+    });
 
-    function logout() {
-      localStorage.removeItem("admin");
-      sessionStorage.removeItem("adminFirebase");
-      import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js").then(({ getAuth, signOut }) => {
-        signOut(getAuth()).then(() => {
-          alert("Logout berhasil!");
-          window.location.href = "index.html";
-        });
+    window.logout = () => {
+      signOut(auth).then(() => {
+        alert("Berhasil logout.");
+        window.location.href = "index.html";
       });
-    }
+    };
+
+    // Form Input Tracking
+    const form = document.getElementById("formTracking");
+    const trackingRef = ref(db, "tracking");
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const data = {
+        nama: form.nama.value,
+        layanan: form.layanan.value,
+        status: form.status.value
+      };
+      push(trackingRef, data).then(() => {
+        form.reset();
+      });
+    });
+
+    // Menampilkan tracking
+    const tbody = document.getElementById("trackingBody");
+    onValue(trackingRef, (snapshot) => {
+      tbody.innerHTML = "";
+      const data = snapshot.val();
+      if (data) {
+        Object.entries(data).forEach(([id, item]) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${item.nama}</td>
+            <td>${item.layanan}</td>
+            <td>
+              <select data-id="${id}" class="status-select">
+                ${["Belum Dijemput", "Sudah Dijemput", "Dicuci", "Disetrika", "Dilipat", "Selesai"]
+                  .map(status => `<option value="${status}" ${item.status === status ? "selected" : ""}>${status}</option>`).join("")}
+              </select>
+            </td>
+            <td><button onclick="hapusTracking('${id}')">Hapus</button></td>
+          `;
+          tbody.appendChild(row);
+        });
+
+        // Event ubah status
+        document.querySelectorAll(".status-select").forEach(select => {
+          select.addEventListener("change", (e) => {
+            const id = e.target.dataset.id;
+            const newStatus = e.target.value;
+            update(ref(db, "tracking/" + id), { status: newStatus });
+          });
+        });
+      }
+    });
+
+    // Hapus tracking
+    window.hapusTracking = (id) => {
+      if (confirm("Yakin ingin menghapus data ini?")) {
+        remove(ref(db, "tracking/" + id));
+      }
+    };
   </script>
+
+  <style>
+    .tracking-card {
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 500px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .tracking-card form {
+      display: flex;
+      flex-direction: column;
+    }
+    .tracking-card form label {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    .tracking-card form input,
+    .tracking-card form select {
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    .tracking-card button {
+      margin-top: 15px;
+      background: #4b91f1;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .tracking-card button:hover {
+      background: #337de4;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 12px;
+      border: 1px solid #ccc;
+    }
+    th {
+      background-color: #4b91f1;
+      color: white;
+    }
+    select.status-select {
+      padding: 6px;
+      border-radius: 4px;
+    }
+  </style>
 </body>
 </html>
