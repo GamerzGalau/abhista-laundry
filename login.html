@@ -1,26 +1,115 @@
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import {
-    getAuth,
-    signInWithEmailAndPassword,
-    onAuthStateChanged,
-    signOut
-  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login Admin - Abhista Laundry</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- Navbar -->
+  <header class="navbar">
+    <a href="index.html" class="logo">Abhista Laundry</a>
+    <nav id="main-nav"></nav>
+  </header>
 
-  const firebaseConfig = { /* config kamu */ };
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
+  <!-- Form Login -->
+  <main class="order-page">
+    <h1 class="order-title">Login Admin</h1>
+    <form class="order-form" id="login-form">
+      <label for="username">Email Admin</label>
+      <input type="email" id="username" name="username" required />
 
-  // Persiapan login form
-  document.querySelector(".order-form").addEventListener("submit", e => {
-    e.preventDefault();
-    const u = document.getElementById("username").value;
-    const p = document.getElementById("password").value;
-    signInWithEmailAndPassword(auth, u, p)
-      .then(() => {
-        alert("Login admin berhasil!");
-        window.location.href = "admin-dashboard.html";
-      })
-      .catch(err => alert(err.message));
-  });
-</script>
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" required />
+
+      <button type="submit" class="btn-order">Masuk</button>
+    </form>
+  </main>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import {
+      getAuth,
+      signInWithEmailAndPassword,
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAg2mhpdg3DH4fJGm2626_2-ysvsXKHRFg",
+      authDomain: "abhista-laundry.firebaseapp.com",
+      projectId: "abhista-laundry",
+      storageBucket: "abhista-laundry.appspot.com",
+      messagingSenderId: "784467467337",
+      appId: "1:784467467337:web:c81cb521dc477b8dc07398"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Login Form
+    document.getElementById("login-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          alert("Login berhasil!");
+          window.location.href = "admin-dashboard.html";
+        })
+        .catch((error) => {
+          alert("Login gagal: " + error.message);
+        });
+    });
+
+    // Navbar Dinamis
+    const nav = document.getElementById("main-nav");
+    const currentPage = window.location.pathname.split("/").pop();
+
+    onAuthStateChanged(auth, (user) => {
+      const isAdmin = !!user;
+      const menuItems = [
+        { href: "index.html", label: "Beranda" },
+        { href: "layanan.html", label: "Layanan" },
+        { href: "order.html", label: "Order" },
+        { href: "tracking.html", label: "Tracking" },
+        ...(isAdmin
+          ? [
+              { href: "pesanan.html", label: "Pesanan" },
+              { href: "admin-dashboard.html", label: "Dashboard" },
+              { href: "#", label: "Logout", isLogout: true }
+            ]
+          : [{ href: "login.html", label: "Login Admin", isLogin: true }]
+        )
+      ];
+
+      nav.innerHTML = menuItems
+        .map((item) => {
+          if (item.isLogout) {
+            return `<a href="#" class="login-button" onclick="logout()">Logout</a>`;
+          }
+          if (item.isLogin) {
+            return `<a href="${item.href}" class="login-button ${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
+          }
+          return `<a href="${item.href}" class="${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
+        })
+        .join("");
+    });
+
+    // Logout
+    window.logout = function () {
+      signOut(auth)
+        .then(() => {
+          alert("Logout berhasil!");
+          window.location.href = "index.html";
+        })
+        .catch((error) => {
+          alert("Gagal logout: " + error.message);
+        });
+    };
+  </script>
+</body>
+</html>
