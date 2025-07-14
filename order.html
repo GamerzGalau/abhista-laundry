@@ -14,7 +14,7 @@
 
   <main class="order-page">
     <h1 class="order-title">Form Pemesanan Antar-Jemput</h1>
-    <form id="orderForm" class="order-form">
+    <form class="order-form" id="orderForm">
       <label for="nama">Nama</label>
       <input type="text" id="nama" name="nama" required />
 
@@ -27,9 +27,9 @@
       <label for="layanan">Jenis Layanan</label>
       <select id="layanan" name="layanan" required>
         <option value="">-- Pilih Layanan --</option>
-        <option value="Cuci Kering">Cuci Kering</option>
-        <option value="Cuci + Setrika">Cuci + Setrika</option>
-        <option value="Cuci Bedcover">Cuci Bedcover</option>
+        <option value="kering">Cuci Kering</option>
+        <option value="setrika">Cuci + Setrika</option>
+        <option value="bedcover">Cuci Bedcover</option>
       </select>
 
       <label>Dijemput Kapan?</label>
@@ -50,47 +50,11 @@
     </form>
   </main>
 
-  <!-- 🔁 Navbar Dinamis -->
-  <script>
-    const nav = document.getElementById("main-nav");
-    const isAdmin = localStorage.getItem("admin") === "true";
-    const currentPage = window.location.pathname.split("/").pop();
-
-    const menuItems = [
-      { href: "index.html", label: "Beranda" },
-      { href: "layanan.html", label: "Layanan" },
-      { href: "order.html", label: "Order" },
-      { href: "tracking.html", label: "Tracking" },
-      ...(isAdmin ? [
-        { href: "pesanan.html", label: "Pesanan" },
-        { href: "admin-dashboard.html", label: "Dashboard" },
-        { href: "#", label: "Logout", isLogout: true }
-      ] : [
-        { href: "login.html", label: "Login Admin", isLogin: true }
-      ])
-    ];
-
-    nav.innerHTML = menuItems.map(item => {
-      if (item.isLogout) {
-        return `<a href="#" class="login-button" onclick="logout()">Logout</a>`;
-      }
-      if (item.isLogin) {
-        return `<a href="${item.href}" class="login-button ${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
-      }
-      return `<a href="${item.href}" class="${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
-    }).join("");
-
-    function logout() {
-      localStorage.removeItem("admin");
-      alert("Logout berhasil!");
-      window.location.href = "index.html";
-    }
-  </script>
-
-  <!-- 🔗 Firebase Handler -->
+  <!-- Firebase App -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAg2mhpdg3DH4fJGm2626_2-ysvsXKHRFg",
@@ -99,15 +63,64 @@
       storageBucket: "abhista-laundry.appspot.com",
       messagingSenderId: "784467467337",
       appId: "1:784467467337:web:c81cb521dc477b8dc07398",
-      measurementId: "G-VKB1VZH6BH",
-      databaseURL: "https://abhista-laundry-default-rtdb.asia-southeast1.firebasedatabase.app/"
+      databaseURL: "https://abhista-laundry-default-rtdb.asia-southeast1.firebasedatabase.app"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    const form = document.getElementById("orderForm");
+    const auth = getAuth(app);
 
-    form.addEventListener("submit", function (e) {
+    // Navbar dinamis
+    const nav = document.getElementById("main-nav");
+    const currentPage = window.location.pathname.split("/").pop();
+
+    const renderNavbar = (isLoggedIn) => {
+      const menuItems = [
+        { href: "index.html", label: "Beranda" },
+        { href: "layanan.html", label: "Layanan" },
+        { href: "order.html", label: "Order" },
+        { href: "tracking.html", label: "Tracking" },
+        ...(isLoggedIn
+          ? [
+              { href: "admin-dashboard.html", label: "Dashboard" },
+              { href: "#", label: "Logout", isLogout: true }
+            ]
+          : [{ href: "login.html", label: "Login Admin", isLogin: true }])
+      ];
+
+      nav.innerHTML = menuItems.map(item => {
+        if (item.isLogout) {
+          return `<a href="#" class="login-button" onclick="logout()">Logout</a>`;
+        }
+        if (item.isLogin) {
+          return `<a href="${item.href}" class="login-button ${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
+        }
+        return `<a href="${item.href}" class="${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
+      }).join("");
+    };
+
+    onAuthStateChanged(auth, (user) => {
+      renderNavbar(!!user);
+    });
+
+    window.logout = () => {
+      signOut(auth).then(() => {
+        alert("Logout berhasil!");
+        window.location.href = "index.html";
+      });
+    };
+
+    // Tampilkan input jam jika pilih "nanti"
+    const radioNanti = document.querySelector('input[value="nanti"]');
+    const radioSekarang = document.querySelector('input[value="sekarang"]');
+    const pilihJam = document.getElementById("pilih-jam");
+
+    radioNanti.addEventListener("change", () => pilihJam.style.display = "block");
+    radioSekarang.addEventListener("change", () => pilihJam.style.display = "none");
+
+    // Kirim ke database
+    const form = document.getElementById("orderForm");
+    form.addEventListener("submit", (e) => {
       e.preventDefault();
 
       const data = {
@@ -126,21 +139,11 @@
         .then(() => {
           alert("Pesanan berhasil dikirim!");
           form.reset();
-          document.getElementById("pilih-jam").style.display = "none";
+          pilihJam.style.display = "none";
         })
-        .catch((error) => {
-          alert("Gagal mengirim pesanan: " + error.message);
-          console.error(error);
+        .catch((err) => {
+          alert("Gagal mengirim pesanan: " + err.message);
         });
-    });
-
-    // Tampilkan field jam jika "nanti" dipilih
-    const radioButtons = document.querySelectorAll('input[name="waktu"]');
-    radioButtons.forEach(radio => {
-      radio.addEventListener("change", () => {
-        const jamBox = document.getElementById("pilih-jam");
-        jamBox.style.display = document.querySelector('input[name="waktu"]:checked').value === "nanti" ? "block" : "none";
-      });
     });
   </script>
 </body>
