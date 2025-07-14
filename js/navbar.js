@@ -1,31 +1,17 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+// navbar.js
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-// Konfigurasi Firebase kamu
-const firebaseConfig = {
-  apiKey: "AIzaSyAg2mhpdg3DH4fJGm2626_2-ysvsXKHRFg",
-  authDomain: "abhista-laundry.firebaseapp.com",
-  projectId: "abhista-laundry",
-  storageBucket: "abhista-laundry.appspot.com",
-  messagingSenderId: "784467467337",
-  appId: "1:784467467337:web:c81cb521dc477b8dc07398",
-  measurementId: "G-VKB1VZH6BH"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
 
 const nav = document.getElementById("main-nav");
 const currentPage = window.location.pathname.split("/").pop();
+const auth = getAuth();
 
-onAuthStateChanged(auth, (user) => {
-  const isAdmin = !!user;
+function renderNavbar(isLoggedIn) {
   const menuItems = [
     { href: "index.html", label: "Beranda" },
     { href: "layanan.html", label: "Layanan" },
     { href: "order.html", label: "Order" },
     { href: "tracking.html", label: "Tracking" },
-    ...(isAdmin
+    ...(isLoggedIn
       ? [
           { href: "admin-dashboard.html", label: "Dashboard" },
           { href: "pesanan.html", label: "Pesanan" },
@@ -43,17 +29,15 @@ onAuthStateChanged(auth, (user) => {
     }
     return `<a href="${item.href}" class="${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
   }).join("");
+}
+
+onAuthStateChanged(auth, (user) => {
+  renderNavbar(!!user);
 });
 
 window.logout = function () {
-  signOut(auth)
-    .then(() => {
-      alert("Logout berhasil!");
-      setTimeout(() => {
-        window.location.href = "index.html";
-      }, 100);
-    })
-    .catch((error) => {
-      alert("Gagal logout: " + error.message);
-    });
+  signOut(auth).then(() => {
+    alert("Logout berhasil!");
+    window.location.href = "index.html";
+  });
 };
