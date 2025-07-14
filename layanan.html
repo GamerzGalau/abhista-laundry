@@ -7,18 +7,9 @@
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <!-- ✅ Navbar statis -->
   <header class="navbar">
     <a href="index.html" class="logo">Abhista Laundry</a>
-    <nav>
-      <a href="index.html">Beranda</a>
-      <a href="layanan.html">Layanan</a>
-      <a href="order.html">Order</a>
-      <a href="tracking.html">Tracking</a>
-      <a href="pesanan.html">Pesanan</a>
-      <a href="admin-dashboard.html">Dashboard</a>
-      <a href="login.html" class="login-button">Login Admin</a>
-    </nav>
+    <nav id="main-nav"></nav>
   </header>
 
   <main class="layanan-page">
@@ -38,7 +29,7 @@
 
       <!-- Card 2 -->
       <div class="layanan-card">
-        <img src="assets/cuci-setrika.png" alt="Cuci Setrika">
+        <img src="assets/cuci-setrika.png" alt="Cuci + Setrika">
         <h2>Cuci + Setrika</h2>
         <p>Pilih sesuai kebutuhan Anda:</p>
         <ul class="harga-list">
@@ -51,15 +42,51 @@
 
       <!-- Card 3 -->
       <div class="layanan-card">
-        <img src="assets/bedcover.png" alt="Bedcover">
+        <img src="assets/bedcover.png" alt="Cuci Bedcover">
         <h2>Cuci Bedcover</h2>
-        <p>Laundry bedcover semua ukuran (antar-jemput gratis).</p>
+        <p>Cocok untuk cucian besar seperti bedcover, selimut, dll.</p>
         <div class="harga-list">
-          <div>Rp25.000 / pcs</div>
+          <div>Mulai Rp25.000 / pcs</div>
         </div>
         <a href="order.html" class="btn-order">Pesan Sekarang</a>
       </div>
     </div>
   </main>
+
+  <script>
+    const nav = document.getElementById("main-nav");
+    const isAdmin = localStorage.getItem("admin") === "true";
+    const currentPage = window.location.pathname.split("/").pop();
+
+    const menuItems = [
+      { href: "index.html", label: "Beranda" },
+      { href: "layanan.html", label: "Layanan" },
+      { href: "order.html", label: "Order" },
+      { href: "tracking.html", label: "Tracking" },
+      ...(isAdmin
+        ? [
+            { href: "admin-dashboard.html", label: "Dashboard" },
+            { href: "pesanan.html", label: "Pesanan" },
+            { href: "#", label: "Logout", isLogout: true }
+          ]
+        : [{ href: "login.html", label: "Login Admin", isLogin: true }])
+    ];
+
+    nav.innerHTML = menuItems.map(item => {
+      if (item.isLogout) {
+        return `<a href="#" class="login-button" onclick="logout()">Logout</a>`;
+      }
+      if (item.isLogin) {
+        return `<a href="${item.href}" class="login-button ${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
+      }
+      return `<a href="${item.href}" class="${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
+    }).join("");
+
+    function logout() {
+      localStorage.removeItem("admin");
+      alert("Logout berhasil!");
+      window.location.href = "index.html";
+    }
+  </script>
 </body>
 </html>
