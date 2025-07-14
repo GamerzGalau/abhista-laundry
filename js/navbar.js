@@ -60,3 +60,9 @@ window.logout = function () {
     window.location.href = "index.html";
   });
 };
+
+// Hamburger toggle (mobile)
+const hamburger = document.getElementById("hamburger");
+hamburger.addEventListener("click", () => {
+  nav.classList.toggle("active");
+});
