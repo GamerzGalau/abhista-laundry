@@ -54,63 +54,7 @@
   </main>
 
   <!-- Navbar Dinamis dengan Firebase Auth -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyAg2mhpdg3DH4fJGm2626_2-ysvsXKHRFg",
-      authDomain: "abhista-laundry.firebaseapp.com",
-      projectId: "abhista-laundry",
-      storageBucket: "abhista-laundry.appspot.com",
-      messagingSenderId: "784467467337",
-      appId: "1:784467467337:web:c81cb521dc477b8dc07398"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const nav = document.getElementById("main-nav");
-    const currentPage = window.location.pathname.split("/").pop();
-
-    onAuthStateChanged(auth, (user) => {
-      const isAdmin = !!user;
-      const menuItems = [
-        { href: "index.html", label: "Beranda" },
-        { href: "layanan.html", label: "Layanan" },
-        { href: "order.html", label: "Order" },
-        { href: "tracking.html", label: "Tracking" },
-        ...(isAdmin
-          ? [
-              { href: "pesanan.html", label: "Pesanan" },
-              { href: "admin-dashboard.html", label: "Dashboard" },
-              { href: "#", label: "Logout", isLogout: true }
-            ]
-          : [{ href: "login.html", label: "Login Admin", isLogin: true }])
-      ];
-
-      nav.innerHTML = menuItems
-        .map((item) => {
-          if (item.isLogout) {
-            return `<a href="#" class="login-button" onclick="logout()">Logout</a>`;
-          }
-          if (item.isLogin) {
-            return `<a href="${item.href}" class="login-button ${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
-          }
-          return `<a href="${item.href}" class="${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
-        })
-        .join("");
-    });
-
-    function logout() {
-      signOut(auth)
-        .then(() => {
-          alert("Logout berhasil!");
-          window.location.href = "index.html";
-        })
-        .catch((error) => {
-          console.error("Logout error:", error);
-        });
-    }
-  </script>
+  <script type="module" src="js/navbar.js"></script>
+  
 </body>
 </html>
