@@ -2,46 +2,9 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Tracking - Abhista Laundry</title>
   <link rel="stylesheet" href="css/style.css" />
-  <style>
-    main {
-      padding: 120px 20px 50px;
-    }
-
-    h1 {
-      text-align: center;
-      color: #333;
-      margin-bottom: 30px;
-    }
-
-    .card-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 20px;
-    }
-
-    .tracking-card {
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      padding: 20px;
-      width: 300px;
-      text-align: left;
-    }
-
-    .tracking-card h3 {
-      margin-bottom: 10px;
-      color: #4b91f1;
-    }
-
-    .tracking-card p {
-      margin: 5px 0;
-      color: #555;
-    }
-  </style>
 </head>
 <body>
   <header class="navbar">
@@ -49,23 +12,20 @@
     <nav id="main-nav"></nav>
   </header>
 
-  <main>
-    <h1>Status Laundry</h1>
-    <div class="card-container" id="tracking-list">
-      <!-- Card status akan ditampilkan di sini -->
-    </div>
+  <main class="tracking-page" style="padding-top: 130px;">
+    <h1 class="order-title">Tracking Laundry</h1>
+    <div id="tracking-list" class="tracking-list"></div>
   </main>
 
-  <!-- Navbar Dinamis + Firebase Tracking -->
+  <!-- Firebase SDK -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAg2mhpdg3DH4fJGm2626_2-ysvsXKHRFg",
       authDomain: "abhista-laundry.firebaseapp.com",
-      databaseURL: "https://abhista-laundry-default-rtdb.asia-southeast1.firebasedatabase.app",
+      databaseURL: "https://abhista-laundry-default-rtdb.asia-southeast1.firebasedatabase.app/",
       projectId: "abhista-laundry",
       storageBucket: "abhista-laundry.appspot.com",
       messagingSenderId: "784467467337",
@@ -73,70 +33,68 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
     const db = getDatabase(app);
 
-    // Navbar dinamis
-    const nav = document.getElementById("main-nav");
-    const currentPage = window.location.pathname.split("/").pop();
-
-    onAuthStateChanged(auth, (user) => {
-      const isAdmin = !!user;
-
-      const menuItems = [
-        { href: "index.html", label: "Beranda" },
-        { href: "layanan.html", label: "Layanan" },
-        { href: "order.html", label: "Order" },
-        { href: "tracking.html", label: "Tracking" },
-        ...(isAdmin
-          ? [
-              { href: "admin-dashboard.html", label: "Dashboard" },
-              { href: "pesanan.html", label: "Pesanan" },
-              { href: "#", label: "Logout", isLogout: true }
-            ]
-          : [{ href: "login.html", label: "Login Admin", isLogin: true }])
-      ];
-
-      nav.innerHTML = menuItems.map(item => {
-        if (item.isLogout) {
-          return `<a href="#" class="login-button" onclick="logout()">Logout</a>`;
-        }
-        if (item.isLogin) {
-          return `<a href="${item.href}" class="login-button ${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
-        }
-        return `<a href="${item.href}" class="${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
-      }).join("");
-    });
-
-    function logout() {
-      auth.signOut().then(() => {
-        alert("Logout berhasil!");
-        window.location.href = "index.html";
-      });
-    }
-
-    // Ambil data tracking dari Firebase
-    const trackingRef = ref(db, "tracking/");
     const trackingList = document.getElementById("tracking-list");
+    const trackingRef = ref(db, "tracking/");
 
     onValue(trackingRef, (snapshot) => {
       trackingList.innerHTML = "";
       const data = snapshot.val();
+
       if (data) {
-        Object.values(data).forEach((item) => {
+        Object.entries(data).forEach(([id, item]) => {
           const card = document.createElement("div");
-          card.classList.add("tracking-card");
+          card.className = "tracking-card";
           card.innerHTML = `
             <h3>${item.nama}</h3>
             <p><strong>Layanan:</strong> ${item.layanan}</p>
             <p><strong>Status:</strong> ${item.status}</p>
+            <p><strong>Harga:</strong> ${item.harga ? "Rp" + item.harga : "-"}</p>
           `;
           trackingList.appendChild(card);
         });
       } else {
-        trackingList.innerHTML = "<p>Tidak ada data tracking tersedia.</p>";
+        trackingList.innerHTML = "<p>Belum ada data tracking tersedia.</p>";
       }
     });
+  </script>
+
+  <!-- Navbar dinamis -->
+  <script>
+    const nav = document.getElementById("main-nav");
+    const isAdmin = localStorage.getItem("admin") === "true";
+    const currentPage = window.location.pathname.split("/").pop();
+
+    const menuItems = [
+      { href: "index.html", label: "Beranda" },
+      { href: "layanan.html", label: "Layanan" },
+      { href: "order.html", label: "Order" },
+      { href: "tracking.html", label: "Tracking" },
+      ...(isAdmin
+        ? [
+            { href: "admin-dashboard.html", label: "Dashboard" },
+            { href: "pesanan.html", label: "Pesanan" },
+            { href: "#", label: "Logout", isLogout: true }
+          ]
+        : [{ href: "login.html", label: "Login Admin", isLogin: true }])
+    ];
+
+    nav.innerHTML = menuItems.map(item => {
+      if (item.isLogout) {
+        return `<a href="#" class="login-button" onclick="logout()">Logout</a>`;
+      }
+      if (item.isLogin) {
+        return `<a href="${item.href}" class="login-button ${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
+      }
+      return `<a href="${item.href}" class="${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
+    }).join("");
+
+    function logout() {
+      localStorage.removeItem("admin");
+      alert("Logout berhasil!");
+      window.location.href = "index.html";
+    }
   </script>
 </body>
 </html>
