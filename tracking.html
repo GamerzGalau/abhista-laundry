@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="css/style.css" />
   <style>
     main {
-      padding: 130px 20px 50px; /* ingetin */
+      padding: 130px 20px 50px;
       background-color: #f0f4f8;
       min-height: 100vh;
     }
@@ -47,7 +47,12 @@
 <body>
   <header class="navbar">
     <a href="index.html" class="logo">Abhista Laundry</a>
-    <nav id="main-nav"></nav>
+    <button class="hamburger" id="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <nav id="main-nav" class="nav-links"></nav>
   </header>
 
   <main>
@@ -57,13 +62,11 @@
     </div>
   </main>
 
-  <!-- Firebase App + Tracking -->
+  <!-- Firebase Tracking Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-    // Konfigurasi Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyAg2mhpdg3DH4fJGm2626_2-ysvsXKHRFg",
       authDomain: "abhista-laundry.firebaseapp.com",
@@ -71,38 +74,31 @@
       projectId: "abhista-laundry",
       storageBucket: "abhista-laundry.appspot.com",
       messagingSenderId: "784467467337",
-      appId: "1:784467467337:web:c81cb521dc477b8dc07398",
+      appId: "1:784467467337:web:c81cb521dc477b8dc07398"
     };
 
     const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
     const db = getDatabase(app);
-
     const list = document.getElementById("tracking-list");
 
-        const trackingRef = ref(db, "tracking/");
-        onValue(trackingRef, (snapshot) => {
-          list.innerHTML = "";
-          const data = snapshot.val();
-          if (data) {
-            Object.values(data).forEach(item => {
-              const card = document.createElement("div");
-              card.classList.add("tracking-card");
-              card.innerHTML = `
-                <h3>${item.nama}</h3>
-                <p><strong>Layanan:</strong> ${item.layanan}</p>
-                <p><strong>Status:</strong> ${item.status}</p>
-                <p><strong>Harga:</strong> ${item.harga || '-'}</p>
-              `;
-              list.appendChild(card);
-            });
-          } else {
-            list.innerHTML = "<p>Tidak ada data tracking.</p>";
-          }
+    const trackingRef = ref(db, "tracking/");
+    onValue(trackingRef, (snapshot) => {
+      list.innerHTML = "";
+      const data = snapshot.val();
+      if (data) {
+        Object.values(data).forEach(item => {
+          const card = document.createElement("div");
+          card.classList.add("tracking-card");
+          card.innerHTML = `
+            <h3>${item.nama}</h3>
+            <p><strong>Layanan:</strong> ${item.layanan}</p>
+            <p><strong>Status:</strong> ${item.status}</p>
+            <p><strong>Harga:</strong> ${item.harga || '-'}</p>
+          `;
+          list.appendChild(card);
         });
       } else {
-        alert("Hanya admin yang dapat melihat halaman ini!");
-        window.location.href = "login.html";
+        list.innerHTML = "<p>Tidak ada data tracking.</p>";
       }
     });
   </script>
