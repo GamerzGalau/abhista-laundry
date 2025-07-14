@@ -5,6 +5,68 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Order - Abhista Laundry</title>
   <link rel="stylesheet" href="css/style.css" />
+  <style>
+    main {
+      padding: 130px 20px 50px; /* ingetin */
+      display: flex;
+      justify-content: center;
+      background-color: #f0f4f8;
+      min-height: 100vh;
+    }
+
+    .order-card {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+      max-width: 500px;
+      width: 100%;
+    }
+
+    .order-card h1 {
+      text-align: center;
+      color: #4b91f1;
+      margin-bottom: 25px;
+    }
+
+    .order-form label {
+      display: block;
+      margin-top: 12px;
+      font-weight: bold;
+    }
+
+    .order-form input,
+    .order-form textarea,
+    .order-form select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 20px;
+      margin-top: 5px;
+    }
+
+    .btn-order {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      background-color: #4b91f1;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .btn-order:hover {
+      background-color: #4078cc;
+    }
+  </style>
 </head>
 <body>
   <header class="navbar">
@@ -12,49 +74,51 @@
     <nav id="main-nav"></nav>
   </header>
 
-  <main class="order-page" style="padding-top: 100px;"> <!-- ingetin -->
-    <h1 class="order-title" style="text-align: center;">Form Pemesanan Antar-Jemput</h1>
-    <form class="order-form" id="orderForm">
-      <label for="nama">Nama</label>
-      <input type="text" id="nama" name="nama" required />
+  <main>
+    <div class="order-card">
+      <h1>Form Pemesanan Antar-Jemput</h1>
+      <form class="order-form" id="orderForm">
+        <label for="nama">Nama</label>
+        <input type="text" id="nama" name="nama" required />
 
-      <label for="nomor">Nomor HP (WA)</label>
-      <input type="tel" id="nomor" name="nomor" required />
+        <label for="nomor">Nomor HP (WA)</label>
+        <input type="tel" id="nomor" name="nomor" required />
 
-      <label for="alamat">Alamat Jemput (Sertakan Link Google Maps)</label>
-      <textarea id="alamat" name="alamat" rows="3" required></textarea>
+        <label for="alamat">Alamat Jemput (Sertakan Link Google Maps)</label>
+        <textarea id="alamat" name="alamat" rows="3" required></textarea>
 
-      <label for="layanan">Jenis Layanan</label>
-      <select id="layanan" name="layanan" required>
-        <option value="">-- Pilih Layanan --</option>
-        <option value="kering">Cuci Kering</option>
-        <option value="setrika">Cuci + Setrika</option>
-        <option value="bedcover">Cuci Bedcover</option>
-      </select>
+        <label for="layanan">Jenis Layanan</label>
+        <select id="layanan" name="layanan" required>
+          <option value="">-- Pilih Layanan --</option>
+          <option value="kering">Cuci Kering</option>
+          <option value="setrika">Cuci + Setrika</option>
+          <option value="bedcover">Cuci Bedcover</option>
+        </select>
 
-      <label>Dijemput Kapan?</label>
-      <div class="radio-group">
-        <label><input type="radio" name="waktu" value="sekarang" checked /> Sekarang</label>
-        <label><input type="radio" name="waktu" value="nanti" /> Nanti</label>
-      </div>
+        <label>Dijemput Kapan?</label>
+        <div class="radio-group">
+          <label><input type="radio" name="waktu" value="sekarang" checked /> Sekarang</label>
+          <label><input type="radio" name="waktu" value="nanti" /> Nanti</label>
+        </div>
 
-      <div id="pilih-jam" style="display: none;">
-        <label for="jam">Pilih Jam Jemput</label>
-        <input type="time" id="jam" name="jam" />
-      </div>
+        <div id="pilih-jam" style="display: none;">
+          <label for="jam">Pilih Jam Jemput</label>
+          <input type="time" id="jam" name="jam" />
+        </div>
 
-      <label for="catatan">Catatan Tambahan</label>
-      <textarea id="catatan" name="catatan" rows="2"></textarea>
+        <label for="catatan">Catatan Tambahan</label>
+        <textarea id="catatan" name="catatan" rows="2"></textarea>
 
-      <button type="submit" class="btn-order">Kirim Pesanan</button>
-    </form>
+        <button type="submit" class="btn-order">Kirim Pesanan</button>
+      </form>
+    </div>
   </main>
 
-  <!-- Firebase + Navbar -->
+  <!-- Firebase + Script Dinamis -->
+  <script type="module" src="js/navbar.js"></script>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAg2mhpdg3DH4fJGm2626_2-ysvsXKHRFg",
@@ -68,9 +132,8 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    const auth = getAuth(app);
 
-    // Jam muncul hanya jika "nanti" dipilih
+    const form = document.getElementById("orderForm");
     const radioNanti = document.querySelector('input[value="nanti"]');
     const radioSekarang = document.querySelector('input[value="sekarang"]');
     const pilihJam = document.getElementById("pilih-jam");
@@ -78,8 +141,6 @@
     radioNanti.addEventListener("change", () => pilihJam.style.display = "block");
     radioSekarang.addEventListener("change", () => pilihJam.style.display = "none");
 
-    // Proses Submit
-    const form = document.getElementById("orderForm");
     form.addEventListener("submit", (e) => {
       e.preventDefault();
 
@@ -106,8 +167,5 @@
         });
     });
   </script>
-
-  <!-- Navbar Dinamis -->
-  <script type="module" src="js/navbar.js"></script>
 </body>
 </html>
