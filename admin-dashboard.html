@@ -6,10 +6,14 @@
   <title>Dashboard Admin - Abhista Laundry</title>
   <link rel="stylesheet" href="css/style.css" />
   <style>
+    main {
+      padding: 130px 20px 50px; /* "ingetin" biar tidak ketutup navbar */
+    }
+
     h1 {
-      margin-top: 120px; /* ingetin */
+      font-size: 26px;
       margin-bottom: 30px;
-      text-align: center;
+      color: #4b91f1;
     }
 
     .form-card {
@@ -17,15 +21,43 @@
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      width: 100%;
       max-width: 500px;
-      margin-bottom: 40px;
+      margin: 0 auto 40px;
+    }
+
+    .form-card label {
+      display: block;
+      margin: 12px 0 5px;
+      font-weight: bold;
+    }
+
+    .form-card input,
+    .form-card select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    .form-card button {
+      margin-top: 15px;
+      background-color: #4b91f1;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .form-card button:hover {
+      background-color: #337de4;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 10px;
+      margin-top: 20px;
     }
 
     th, td {
@@ -43,24 +75,17 @@
       background-color: #f2f2f2;
     }
 
-    .action-button {
-      background-color: #4b91f1;
-      color: white;
-      padding: 6px 10px;
-      border-radius: 4px;
-      text-decoration: none;
-      font-size: 13px;
-      margin-right: 5px;
+    .status-select {
+      padding: 5px;
     }
 
-    @media (max-width: 768px) {
-      .flex-wrapper {
-        flex-direction: column;
-      }
-
-      .form-card {
-        max-width: 100%;
-      }
+    .delete-btn {
+      background-color: #ff4d4d;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -73,59 +98,51 @@
   <main>
     <h1>Dashboard Admin - Tracking Laundry</h1>
 
-    <div class="flex-wrapper" style="display: flex; gap: 40px; align-items: flex-start; flex-wrap: wrap; padding: 0 20px;">
-      <!-- Form Input Tracking -->
-      <div class="form-card">
-        <form id="trackingForm">
-          <label for="nama">Nama</label>
-          <input type="text" id="nama" required />
+    <div class="form-card">
+      <label>Nama Pelanggan</label>
+      <input type="text" id="nama" required />
 
-          <label for="layanan">Layanan</label>
-          <select id="layanan" required>
-            <option value="">Pilih layanan</option>
-            <option value="Cuci Kering">Cuci Kering</option>
-            <option value="Cuci + Setrika">Cuci + Setrika</option>
-            <option value="Cuci Bedcover">Cuci Bedcover</option>
-          </select>
+      <label>Jenis Layanan</label>
+      <select id="layanan" required>
+        <option value="Cuci Kering">Cuci Kering</option>
+        <option value="Cuci + Setrika">Cuci + Setrika</option>
+        <option value="Cuci Bedcover">Cuci Bedcover</option>
+      </select>
 
-          <label for="status">Status</label>
-          <select id="status" required>
-            <option value="Belum Dijemput">Belum Dijemput</option>
-            <option value="Sedang Diproses">Sedang Diproses</option>
-            <option value="Disetrika">Disetrika</option>
-            <option value="Dilipat">Dilipat</option>
-            <option value="Selesai">Selesai</option>
-          </select>
+      <label>Status</label>
+      <select id="status" required>
+        <option value="Belum Dijemput">Belum Dijemput</option>
+        <option value="Sudah Dijemput">Sudah Dijemput</option>
+        <option value="Dicuci">Dicuci</option>
+        <option value="Disetrika">Disetrika</option>
+        <option value="Dilipat">Dilipat</option>
+        <option value="Selesai">Selesai</option>
+      </select>
 
-          <label for="harga">Harga (opsional)</label>
-          <input type="text" id="harga" placeholder="Contoh: Rp15.000" />
+      <label>Harga (Opsional)</label>
+      <input type="number" id="harga" placeholder="cth: 15000" />
 
-          <button type="submit" class="btn-order">Tambah Tracking</button>
-        </form>
-      </div>
-
-      <!-- Tabel Tracking -->
-      <div style="flex: 1; min-width: 300px;">
-        <table>
-          <thead>
-            <tr>
-              <th>Nama</th>
-              <th>Layanan</th>
-              <th>Status</th>
-              <th>Harga</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody id="tracking-body"></tbody>
-        </table>
-      </div>
+      <button onclick="tambahTracking()">Tambah Tracking</button>
     </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Nama</th>
+          <th>Layanan</th>
+          <th>Status</th>
+          <th>Harga</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="tracking-body"></tbody>
+    </table>
   </main>
 
+  <!-- Firebase & Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAg2mhpdg3DH4fJGm2626_2-ysvsXKHRFg",
@@ -139,33 +156,11 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    const auth = getAuth();
-
-    const form = document.getElementById("trackingForm");
-    const tbody = document.getElementById("tracking-body");
     const trackingRef = ref(db, "tracking");
 
-    onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        alert("Silakan login sebagai admin terlebih dahulu.");
-        window.location.href = "login.html";
-      }
-    });
+    const tbody = document.getElementById("tracking-body");
 
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const data = {
-        nama: form.nama.value,
-        layanan: form.layanan.value,
-        status: form.status.value,
-        harga: form.harga.value || "-"
-      };
-
-      push(trackingRef, data).then(() => {
-        form.reset();
-      });
-    });
-
+    // Menampilkan data tracking
     onValue(trackingRef, (snapshot) => {
       tbody.innerHTML = "";
       const data = snapshot.val();
@@ -175,55 +170,65 @@
           row.innerHTML = `
             <td>${item.nama}</td>
             <td>${item.layanan}</td>
-            <td>${item.status}</td>
-            <td>${item.harga || "-"}</td>
             <td>
-              <button class="action-button" onclick="editTracking('${id}', '${item.nama}', '${item.layanan}', '${item.status}', '${item.harga || ""}')">Edit</button>
-              <button class="action-button" onclick="deleteTracking('${id}')">Hapus</button>
+              <select data-id="${id}" class="status-select">
+                ${["Belum Dijemput", "Sudah Dijemput", "Dicuci", "Disetrika", "Dilipat", "Selesai"]
+                  .map(status => `<option value="${status}" ${item.status === status ? "selected" : ""}>${status}</option>`).join("")}
+              </select>
             </td>
+            <td>${item.harga || "-"}</td>
+            <td><button class="delete-btn" onclick="hapusTracking('${id}')">Hapus</button></td>
           `;
           tbody.appendChild(row);
         });
-      } else {
-        tbody.innerHTML = `<tr><td colspan="5">Belum ada data tracking.</td></tr>`;
       }
     });
 
-    window.deleteTracking = (id) => {
-      if (confirm("Yakin ingin menghapus data ini?")) {
-        remove(ref(db, "tracking/" + id));
-      }
+    // Tambah tracking baru
+    window.tambahTracking = function () {
+      const nama = document.getElementById("nama").value.trim();
+      const layanan = document.getElementById("layanan").value;
+      const status = document.getElementById("status").value;
+      const harga = document.getElementById("harga").value;
+
+      if (!nama) return alert("Nama harus diisi.");
+
+      const data = {
+        nama,
+        layanan,
+        status,
+        harga: harga || "-"
+      };
+
+      push(trackingRef, data)
+        .then(() => {
+          document.getElementById("nama").value = "";
+          document.getElementById("harga").value = "";
+        });
     };
 
-    window.editTracking = (id, nama, layanan, status, harga) => {
-      form.nama.value = nama;
-      form.layanan.value = layanan;
-      form.status.value = status;
-      form.harga.value = harga;
+    // Edit status langsung
+    document.addEventListener("change", (e) => {
+      if (e.target.classList.contains("status-select")) {
+        const id = e.target.dataset.id;
+        const newStatus = e.target.value;
+        update(ref(db, "tracking/" + id), { status: newStatus });
+      }
+    });
 
-      form.removeEventListener("submit", handleSubmit);
-
-      form.onsubmit = (e) => {
-        e.preventDefault();
-        update(ref(db, "tracking/" + id), {
-          nama: form.nama.value,
-          layanan: form.layanan.value,
-          status: form.status.value,
-          harga: form.harga.value || "-"
-        }).then(() => {
-          form.reset();
-          form.onsubmit = null;
-          location.reload();
-        });
-      };
+    // Hapus tracking
+    window.hapusTracking = function (id) {
+      if (confirm("Yakin ingin menghapus tracking ini?")) {
+        remove(ref(db, "tracking/" + id));
+      }
     };
   </script>
 
   <!-- Navbar dinamis -->
   <script>
     const nav = document.getElementById("main-nav");
+    const isAdmin = localStorage.getItem("admin") === "true";
     const currentPage = window.location.pathname.split("/").pop();
-    const isAdmin = localStorage.getItem("admin") === "true" || !!sessionStorage.getItem("firebase:authUser:default");
 
     const menuItems = [
       { href: "index.html", label: "Beranda" },
@@ -251,7 +256,6 @@
 
     function logout() {
       localStorage.removeItem("admin");
-      sessionStorage.clear();
       alert("Logout berhasil!");
       window.location.href = "index.html";
     }
