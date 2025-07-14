@@ -223,19 +223,21 @@ main {
 .order-card h1 {
   text-align: center;
   color: #4b91f1;
-  margin-bottom: 25px;
+  margin-bottom: 20px;
   font-size: 20px;
-  white-space: nowrap; /* 👈 Biar tidak terpotong ke baris baru */
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  padding: 0 10px;
 }
 
+.order-form label:first-of-type {
+  margin-top: 0;
+}
+  
 .order-form label {
-  display: block;
-  margin-top: 10px; /* Diperpendek */
-  font-weight: bold;
+  margin-top: 12px;
 }
-
   
   .order-page {
   padding: 130px 20px 50px; /* 130px untuk menghindari tertutup navbar */
