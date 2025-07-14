@@ -413,3 +413,59 @@ nav a.active {
   border-radius: 6px;
   padding: 8px 15px;
 }
+
+/* Hamburger Button */
+.hamburger {
+  display: none;
+  font-size: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #4b91f1;
+  z-index: 110;
+}
+
+/* Menu Default di Mobile: Sembunyi */
+nav.hidden {
+  display: none;
+}
+
+/* Menu Tampil Saat Aktif */
+nav.show {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 70px;
+  right: 20px;
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+nav.show a {
+  margin: 10px 0;
+}
+
+/* Responsive Rules */
+@media (max-width: 768px) {
+  .hamburger {
+    display: block;
+  }
+
+  .navbar {
+    position: relative;
+  }
+
+  nav {
+    position: absolute;
+    right: 0;
+    top: 70px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  nav a {
+    margin: 10px 0;
+  }
+}
