@@ -12,6 +12,11 @@
       min-height: 100vh;
     }
 
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
     .card-container {
       display: flex;
       flex-wrap: wrap;
@@ -46,17 +51,19 @@
   </header>
 
   <main>
-    <h1 style="text-align: center; margin-bottom: 30px;">Status Laundry Pelanggan</h1>
+    <h1>Status Laundry Pelanggan</h1>
     <div class="card-container" id="tracking-list">
-      <!-- Data tracking muncul di sini -->
+      <!-- Data tracking akan muncul di sini -->
     </div>
   </main>
 
+  <!-- Firebase App + Tracking -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
+    // Konfigurasi Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyAg2mhpdg3DH4fJGm2626_2-ysvsXKHRFg",
       authDomain: "abhista-laundry.firebaseapp.com",
@@ -68,7 +75,7 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const auth = getAuth();
+    const auth = getAuth(app);
     const db = getDatabase(app);
 
     const list = document.getElementById("tracking-list");
@@ -102,48 +109,7 @@
     });
   </script>
 
-  <script>
-    // Navbar Dinamis
-    const nav = document.getElementById("main-nav");
-    const currentPage = window.location.pathname.split("/").pop();
-
-    import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js").then(({ getAuth, onAuthStateChanged }) => {
-      const auth = getAuth();
-      onAuthStateChanged(auth, (user) => {
-        const menuItems = [
-          { href: "index.html", label: "Beranda" },
-          { href: "layanan.html", label: "Layanan" },
-          { href: "order.html", label: "Order" },
-          { href: "tracking.html", label: "Tracking" },
-        ];
-
-        if (user) {
-          menuItems.push({ href: "pesanan.html", label: "Pesanan" });
-          menuItems.push({ href: "admin-dashboard.html", label: "Dashboard" });
-          menuItems.push({ href: "#", label: "Logout", isLogout: true });
-        } else {
-          menuItems.push({ href: "login.html", label: "Login Admin", isLogin: true });
-        }
-
-        nav.innerHTML = menuItems.map(item => {
-          if (item.isLogout) {
-            return `<a href="#" class="login-button" onclick="logout()">Logout</a>`;
-          }
-          const activeClass = currentPage === item.href ? "active" : "";
-          return `<a href="${item.href}" class="${item.isLogin ? 'login-button' : ''} ${activeClass}">${item.label}</a>`;
-        }).join("");
-      });
-    });
-
-    function logout() {
-      import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js").then(({ getAuth, signOut }) => {
-        const auth = getAuth();
-        signOut(auth).then(() => {
-          alert("Logout berhasil!");
-          window.location.href = "index.html";
-        });
-      });
-    }
-  </script>
+  <!-- Navbar Dinamis -->
+  <script type="module" src="js/navbar.js"></script>
 </body>
 </html>
