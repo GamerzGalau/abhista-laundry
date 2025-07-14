@@ -12,8 +12,8 @@
     <nav id="main-nav"></nav>
   </header>
 
-  <main class="order-page">
-    <h1 class="order-title">Form Pemesanan Antar-Jemput</h1>
+  <main class="order-page" style="padding-top: 100px;"> <!-- ingetin -->
+    <h1 class="order-title" style="text-align: center;">Form Pemesanan Antar-Jemput</h1>
     <form class="order-form" id="orderForm">
       <label for="nama">Nama</label>
       <input type="text" id="nama" name="nama" required />
@@ -50,7 +50,7 @@
     </form>
   </main>
 
-  <!-- Firebase App -->
+  <!-- Firebase + Navbar -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -70,48 +70,7 @@
     const db = getDatabase(app);
     const auth = getAuth(app);
 
-    // Navbar dinamis
-    const nav = document.getElementById("main-nav");
-    const currentPage = window.location.pathname.split("/").pop();
-
-    const renderNavbar = (isLoggedIn) => {
-      const menuItems = [
-        { href: "index.html", label: "Beranda" },
-        { href: "layanan.html", label: "Layanan" },
-        { href: "order.html", label: "Order" },
-        { href: "tracking.html", label: "Tracking" },
-        ...(isLoggedIn
-          ? [
-              { href: "admin-dashboard.html", label: "Dashboard" },
-              { href: "pesanan.html", label: "Pesanan" },
-              { href: "#", label: "Logout", isLogout: true }
-            ]
-          : [{ href: "login.html", label: "Login Admin", isLogin: true }])
-      ];
-
-      nav.innerHTML = menuItems.map(item => {
-        if (item.isLogout) {
-          return `<a href="#" class="login-button" onclick="logout()">Logout</a>`;
-        }
-        if (item.isLogin) {
-          return `<a href="${item.href}" class="login-button ${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
-        }
-        return `<a href="${item.href}" class="${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
-      }).join("");
-    };
-
-    onAuthStateChanged(auth, (user) => {
-      renderNavbar(!!user);
-    });
-
-    window.logout = () => {
-      signOut(auth).then(() => {
-        alert("Logout berhasil!");
-        window.location.href = "index.html";
-      });
-    };
-
-    // Tampilkan input jam jika pilih "nanti"
+    // Jam muncul hanya jika "nanti" dipilih
     const radioNanti = document.querySelector('input[value="nanti"]');
     const radioSekarang = document.querySelector('input[value="sekarang"]');
     const pilihJam = document.getElementById("pilih-jam");
@@ -119,7 +78,7 @@
     radioNanti.addEventListener("change", () => pilihJam.style.display = "block");
     radioSekarang.addEventListener("change", () => pilihJam.style.display = "none");
 
-    // Kirim ke database
+    // Proses Submit
     const form = document.getElementById("orderForm");
     form.addEventListener("submit", (e) => {
       e.preventDefault();
@@ -147,5 +106,8 @@
         });
     });
   </script>
+
+  <!-- Navbar Dinamis -->
+  <script type="module" src="js/navbar.js"></script>
 </body>
 </html>
