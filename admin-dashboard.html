@@ -7,37 +7,36 @@
   <link rel="stylesheet" href="css/style.css" />
   <style>
     main {
-      padding: 120px 20px 40px;
+      padding: 130px 20px 50px;
       display: flex;
-      gap: 30px;
-      flex-wrap: wrap;
-      justify-content: center;
+      flex-direction: column;
+      align-items: center;
     }
 
-    .card-tracking {
-      flex: 1;
-      min-width: 300px;
-      max-width: 400px;
-      background-color: white;
+    .tracking-form {
+      width: 100%;
+      max-width: 500px;
+      background-color: #fff;
       padding: 20px;
       border-radius: 10px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
     }
 
-    .card-tracking h2 {
-      font-size: 20px;
-      margin-bottom: 15px;
+    .tracking-form h2 {
       color: #4b91f1;
+      margin-bottom: 20px;
     }
 
-    .card-tracking label {
+    .tracking-form label {
       display: block;
+      text-align: left;
       margin-top: 10px;
-      font-weight: 600;
+      font-weight: bold;
     }
 
-    .card-tracking input,
-    .card-tracking select {
+    .tracking-form input,
+    .tracking-form select {
       width: 100%;
       padding: 8px;
       margin-top: 5px;
@@ -45,31 +44,32 @@
       border: 1px solid #ccc;
     }
 
-    .card-tracking button {
+    .tracking-form button {
       margin-top: 15px;
       background-color: #4b91f1;
       color: white;
-      border: none;
       padding: 10px;
+      border: none;
       border-radius: 6px;
       cursor: pointer;
       font-weight: bold;
+      width: 100%;
     }
 
-    .table-wrapper {
-      flex: 2;
+    .tracking-table {
+      margin-top: 40px;
+      width: 100%;
       overflow-x: auto;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 0;
     }
 
     th, td {
-      padding: 12px;
-      border: 1px solid #ccc;
+      padding: 10px;
+      border: 1px solid #ddd;
       text-align: left;
     }
 
@@ -78,18 +78,23 @@
       color: white;
     }
 
-    .action-button {
-      padding: 6px 10px;
-      background-color: #f44336;
-      color: white;
-      border-radius: 5px;
+    .btn-edit, .btn-delete {
+      padding: 5px 10px;
+      font-size: 12px;
+      margin-right: 5px;
+      border: none;
+      border-radius: 4px;
       cursor: pointer;
-      font-size: 13px;
     }
 
-    .edit-button {
-      background-color: #4caf50;
-      margin-right: 5px;
+    .btn-edit {
+      background-color: #ffa500;
+      color: white;
+    }
+
+    .btn-delete {
+      background-color: #f44336;
+      color: white;
     }
   </style>
 </head>
@@ -100,9 +105,9 @@
   </header>
 
   <main>
-    <!-- Form Tracking -->
-    <div class="card-tracking">
-      <h2>Input Tracking</h2>
+    <!-- Form Input Tracking -->
+    <div class="tracking-form">
+      <h2>Input Status Tracking</h2>
       <form id="trackingForm">
         <label for="nama">Nama Pelanggan</label>
         <input type="text" id="nama" required />
@@ -117,24 +122,26 @@
 
         <label for="status">Status</label>
         <select id="status" required>
-          <option value="Belum Dijemput">Belum Dijemput</option>
-          <option value="Sedang Dicuci">Sedang Dicuci</option>
+          <option value="">Pilih Status</option>
+          <option value="Dijemput">Dijemput</option>
+          <option value="Diproses">Diproses</option>
+          <option value="Dicuci">Dicuci</option>
           <option value="Disetrika">Disetrika</option>
           <option value="Dilipat">Dilipat</option>
           <option value="Selesai">Selesai</option>
         </select>
 
         <label for="harga">Harga (Opsional)</label>
-        <input type="text" id="harga" placeholder="Contoh: Rp 10.000" />
+        <input type="text" id="harga" placeholder="contoh: Rp20.000" />
 
-        <button type="submit">Tambah Tracking</button>
+        <button type="submit">Simpan</button>
       </form>
     </div>
 
     <!-- Tabel Tracking -->
-    <div class="table-wrapper">
-      <h2 style="margin-bottom: 10px; color: #4b91f1;">Daftar Tracking</h2>
-      <table id="trackingTable">
+    <div class="tracking-table">
+      <h2 style="text-align: center;">Daftar Tracking</h2>
+      <table>
         <thead>
           <tr>
             <th>Nama</th>
@@ -144,15 +151,117 @@
             <th>Aksi</th>
           </tr>
         </thead>
-        <tbody>
-          <!-- Data tracking akan muncul di sini -->
+        <tbody id="trackingBody">
+          <!-- Data dari Firebase -->
         </tbody>
       </table>
     </div>
   </main>
 
-  <!-- Script Firebase + Dynamic Navbar + Tracking Logic -->
-  <script type="module" src="js/admin-dashboard.js"></script>
-  <script src="js/navbar.js"></script>
+  <!-- Firebase & Navbar Dinamis -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAg2mhpdg3DH4fJGm2626_2-ysvsXKHRFg",
+      authDomain: "abhista-laundry.firebaseapp.com",
+      projectId: "abhista-laundry",
+      storageBucket: "abhista-laundry.appspot.com",
+      messagingSenderId: "784467467337",
+      appId: "1:784467467337:web:c81cb521dc477b8dc07398",
+      databaseURL: "https://abhista-laundry-default-rtdb.asia-southeast1.firebasedatabase.app/"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth(app);
+
+    const form = document.getElementById("trackingForm");
+    const tbody = document.getElementById("trackingBody");
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const data = {
+        nama: document.getElementById("nama").value,
+        layanan: document.getElementById("layanan").value,
+        status: document.getElementById("status").value,
+        harga: document.getElementById("harga").value || "-"
+      };
+
+      push(ref(db, "tracking/"), data).then(() => {
+        form.reset();
+        alert("Tracking berhasil ditambahkan.");
+      });
+    });
+
+    onValue(ref(db, "tracking/"), (snapshot) => {
+      tbody.innerHTML = "";
+      const data = snapshot.val();
+      if (data) {
+        Object.entries(data).forEach(([key, value]) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${value.nama}</td>
+            <td>${value.layanan}</td>
+            <td>${value.status}</td>
+            <td>${value.harga || '-'}</td>
+            <td>
+              <button class="btn-edit" onclick="editTracking('${key}')">Edit</button>
+              <button class="btn-delete" onclick="deleteTracking('${key}')">Hapus</button>
+            </td>`;
+          tbody.appendChild(row);
+        });
+      }
+    });
+
+    window.editTracking = function (id) {
+      const tr = document.querySelector(`button[onclick="editTracking('${id}')"]`).closest("tr");
+      document.getElementById("nama").value = tr.children[0].innerText;
+      document.getElementById("layanan").value = tr.children[1].innerText;
+      document.getElementById("status").value = tr.children[2].innerText;
+      document.getElementById("harga").value = tr.children[3].innerText === "-" ? "" : tr.children[3].innerText;
+      deleteTracking(id);
+    };
+
+    window.deleteTracking = function (id) {
+      remove(ref(db, "tracking/" + id));
+    };
+
+    // Navbar Dinamis
+    const nav = document.getElementById("main-nav");
+    onAuthStateChanged(auth, (user) => {
+      const currentPage = window.location.pathname.split("/").pop();
+      const menuItems = [
+        { href: "index.html", label: "Beranda" },
+        { href: "layanan.html", label: "Layanan" },
+        { href: "order.html", label: "Order" },
+        { href: "tracking.html", label: "Tracking" },
+        ...(user
+          ? [
+              { href: "admin-dashboard.html", label: "Dashboard" },
+              { href: "pesanan.html", label: "Pesanan" },
+              { href: "#", label: "Logout", isLogout: true }
+            ]
+          : [{ href: "login.html", label: "Login Admin", isLogin: true }])
+      ];
+
+      nav.innerHTML = menuItems.map(item => {
+        if (item.isLogout) {
+          return `<a href="#" class="login-button" onclick="logout()">Logout</a>`;
+        }
+        return `<a href="${item.href}" class="${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
+      }).join("");
+    });
+
+    function logout() {
+      auth.signOut().then(() => {
+        alert("Logout berhasil!");
+        window.location.href = "index.html";
+      });
+    }
+  </script>
 </body>
 </html>
