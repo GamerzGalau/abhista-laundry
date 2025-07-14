@@ -7,7 +7,13 @@
   <link rel="stylesheet" href="css/style.css" />
   <style>
     main {
-      padding: 130px 20px 50px;
+      padding: 120px 20px 50px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 30px;
     }
 
     table {
@@ -17,7 +23,7 @@
     }
 
     th, td {
-      padding: 12px;
+      padding: 10px;
       border: 1px solid #ccc;
       text-align: left;
     }
@@ -28,7 +34,7 @@
     }
 
     tbody tr:hover {
-      background-color: #f2f2f2;
+      background-color: #f9f9f9;
     }
   </style>
 </head>
@@ -38,117 +44,118 @@
     <nav id="main-nav"></nav>
   </header>
 
-  <main class="container">
+  <main>
     <h1>Daftar Pesanan Pelanggan</h1>
     <table>
       <thead>
         <tr>
           <th>Nama</th>
-          <th>Nomor WA</th>
+          <th>Nomor HP</th>
           <th>Alamat Jemput</th>
-          <th>Jenis Layanan</th>
+          <th>Layanan</th>
           <th>Waktu Jemput</th>
           <th>Catatan</th>
         </tr>
       </thead>
-      <tbody id="pesanan-body">
-        <tr><td colspan="6">Memuat data...</td></tr>
+      <tbody id="pesanan-tbody">
+        <!-- Data pesanan ditampilkan di sini -->
       </tbody>
     </table>
   </main>
 
-  <!-- Firebase SDK -->
+  <!-- Firebase Auth + Navbar Dinamis + Ambil Data -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAg2mhpdg3DH4fJGm2626_2-ysvsXKHRFg",
       authDomain: "abhista-laundry.firebaseapp.com",
+      databaseURL: "https://abhista-laundry-default-rtdb.asia-southeast1.firebasedatabase.app",
       projectId: "abhista-laundry",
-      databaseURL: "https://abhista-laundry-default-rtdb.asia-southeast1.firebasedatabase.app/",
       storageBucket: "abhista-laundry.appspot.com",
       messagingSenderId: "784467467337",
       appId: "1:784467467337:web:c81cb521dc477b8dc07398",
-      measurementId: "G-VKB1VZH6BH"
     };
 
     const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
     const auth = getAuth(app);
+    const db = getDatabase(app);
 
-    const tbody = document.getElementById("pesanan-body");
-
-    onAuthStateChanged(auth, user => {
-      if (user) {
-        const pesananRef = ref(db, "pesanan/");
-        onValue(pesananRef, (snapshot) => {
-          const data = snapshot.val();
-          tbody.innerHTML = "";
-
-          if (data) {
-            Object.values(data).forEach((pesan) => {
-              const row = document.createElement("tr");
-              row.innerHTML = `
-                <td>${pesan.nama}</td>
-                <td>${pesan.nomor}</td>
-                <td><a href="${pesan.gmaps}" target="_blank">${pesan.alamat}</a></td>
-                <td>${pesan.layanan}</td>
-                <td>${pesan.waktu === "nanti" ? pesan.waktu + " - " + pesan.jam : "sekarang"}</td>
-                <td>${pesan.catatan || "-"}</td>
-              `;
-              tbody.appendChild(row);
-            });
-          } else {
-            tbody.innerHTML = `<tr><td colspan="6">Belum ada pesanan masuk.</td></tr>`;
-          }
-        });
-      } else {
-        alert("Halaman ini hanya untuk admin. Silakan login terlebih dahulu.");
+    // Cek login admin
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        alert("Akses ditolak. Silakan login sebagai admin.");
         window.location.href = "login.html";
+      } else {
+        loadPesanan();
+        generateNavbar(true);
       }
     });
-  </script>
 
-  <!-- Navbar dinamis -->
-  <script>
+    // Navbar Dinamis
     const nav = document.getElementById("main-nav");
     const currentPage = window.location.pathname.split("/").pop();
-    const isAdmin = !!localStorage.getItem("admin");
 
-    const menuItems = [
-      { href: "index.html", label: "Beranda" },
-      { href: "layanan.html", label: "Layanan" },
-      { href: "order.html", label: "Order" },
-      { href: "tracking.html", label: "Tracking" },
-      ...(isAdmin
-        ? [
-            { href: "pesanan.html", label: "Pesanan" },
-            { href: "admin-dashboard.html", label: "Dashboard" },
-            { href: "#", label: "Logout", isLogout: true }
-          ]
-        : [{ href: "login.html", label: "Login Admin", isLogin: true }])
-    ];
+    function generateNavbar(isAdmin) {
+      const menuItems = [
+        { href: "index.html", label: "Beranda" },
+        { href: "layanan.html", label: "Layanan" },
+        { href: "order.html", label: "Order" },
+        { href: "tracking.html", label: "Tracking" },
+        ...(isAdmin
+          ? [
+              { href: "admin-dashboard.html", label: "Dashboard" },
+              { href: "pesanan.html", label: "Pesanan" },
+              { href: "#", label: "Logout", isLogout: true }
+            ]
+          : [{ href: "login.html", label: "Login Admin", isLogin: true }])
+      ];
 
-    nav.innerHTML = menuItems.map(item => {
-      if (item.isLogout) {
-        return `<a href="#" class="login-button" onclick="logout()">Logout</a>`;
-      }
-      if (item.isLogin) {
-        return `<a href="${item.href}" class="login-button ${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
-      }
-      return `<a href="${item.href}" class="${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
-    }).join("");
+      nav.innerHTML = menuItems.map(item => {
+        if (item.isLogout) {
+          return `<a href="#" class="login-button" onclick="logout()">Logout</a>`;
+        }
+        if (item.isLogin) {
+          return `<a href="${item.href}" class="login-button ${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
+        }
+        return `<a href="${item.href}" class="${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
+      }).join("");
+    }
 
     function logout() {
-      localStorage.removeItem("admin");
-      import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js").then(({ getAuth, signOut }) => {
-        const auth = getAuth();
-        signOut(auth).then(() => {
-          alert("Logout berhasil!");
-          window.location.href = "index.html";
-        });
+      auth.signOut().then(() => {
+        alert("Logout berhasil!");
+        window.location.href = "index.html";
+      });
+    }
+
+    // Ambil data dari database
+    function loadPesanan() {
+      const tbody = document.getElementById("pesanan-tbody");
+      const pesananRef = ref(db, "pesanan/");
+
+      onValue(pesananRef, (snapshot) => {
+        tbody.innerHTML = "";
+        const data = snapshot.val();
+
+        if (data) {
+          Object.values(data).forEach((item) => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td>${item.nama}</td>
+              <td>${item.nomor}</td>
+              <td><a href="${item.gmaps}" target="_blank">${item.alamat}</a></td>
+              <td>${item.layanan}</td>
+              <td>${item.waktu === 'nanti' ? item.waktu + ' - ' + item.jam : 'sekarang'}</td>
+              <td>${item.catatan || '-'}</td>
+            `;
+            tbody.appendChild(tr);
+          });
+        } else {
+          tbody.innerHTML = `<tr><td colspan="6">Belum ada pesanan.</td></tr>`;
+        }
       });
     }
   </script>
