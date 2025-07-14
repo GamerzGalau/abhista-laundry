@@ -50,7 +50,7 @@
     </form>
   </main>
 
-  <!-- Navbar Dinamis -->
+  <!-- 🔁 Navbar Dinamis -->
   <script>
     const nav = document.getElementById("main-nav");
     const isAdmin = localStorage.getItem("admin") === "true";
@@ -61,13 +61,13 @@
       { href: "layanan.html", label: "Layanan" },
       { href: "order.html", label: "Order" },
       { href: "tracking.html", label: "Tracking" },
-      ...(isAdmin
-        ? [
-            { href: "admin-dashboard.html", label: "Dashboard" },
-            { href: "pesanan.html", label: "Pesanan" },
-            { href: "#", label: "Logout", isLogout: true }
-          ]
-        : [{ href: "login.html", label: "Login Admin", isLogin: true }])
+      ...(isAdmin ? [
+        { href: "pesanan.html", label: "Pesanan" },
+        { href: "admin-dashboard.html", label: "Dashboard" },
+        { href: "#", label: "Logout", isLogout: true }
+      ] : [
+        { href: "login.html", label: "Login Admin", isLogin: true }
+      ])
     ];
 
     nav.innerHTML = menuItems.map(item => {
@@ -87,7 +87,7 @@
     }
   </script>
 
-  <!-- Firebase & Form Handler -->
+  <!-- 🔗 Firebase Handler -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -134,16 +134,12 @@
         });
     });
 
-    // Toggle Jam Picker
+    // Tampilkan field jam jika "nanti" dipilih
     const radioButtons = document.querySelectorAll('input[name="waktu"]');
     radioButtons.forEach(radio => {
       radio.addEventListener("change", () => {
         const jamBox = document.getElementById("pilih-jam");
-        if (document.querySelector('input[name="waktu"]:checked').value === "nanti") {
-          jamBox.style.display = "block";
-        } else {
-          jamBox.style.display = "none";
-        }
+        jamBox.style.display = document.querySelector('input[name="waktu"]:checked').value === "nanti" ? "block" : "none";
       });
     });
   </script>
