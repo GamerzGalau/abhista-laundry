@@ -203,7 +203,41 @@ a.logo:hover {
   margin-bottom: 4px;
 }
 
-.order-page {
+main {
+  padding: 130px 20px 50px;
+  display: flex;
+  justify-content: center;
+  background-color: #f0f4f8;
+  min-height: 100vh;
+}
+
+.order-card {
+  background: white;
+  padding: 30px 24px; /* dikurangi padding agar lebih rapat */
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+  max-width: 500px;
+  width: 100%;
+}
+
+.order-card h1 {
+  text-align: center;
+  color: #4b91f1;
+  margin-bottom: 25px;
+  font-size: 20px;
+  white-space: nowrap; /* 👈 Biar tidak terpotong ke baris baru */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.order-form label {
+  display: block;
+  margin-top: 10px; /* Diperpendek */
+  font-weight: bold;
+}
+
+  
+  .order-page {
   padding: 130px 20px 50px; /* 130px untuk menghindari tertutup navbar */
   background-color: #f0f4f8;
   min-height: 100vh;
@@ -224,11 +258,6 @@ a.logo:hover {
   display: flex;
   flex-direction: column;
   gap: 15px;
-}
-
-.order-form label {
-  font-weight: bold;
-  color: #333;
 }
 
 .order-form input,
