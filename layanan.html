@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Layanan - Abhista Laundry</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
@@ -18,7 +18,7 @@
     <div class="card-container">
       <!-- Card 1 -->
       <div class="layanan-card">
-        <img src="assets/cuci-kering.png" alt="Cuci Kering">
+        <img src="assets/cuci-kering.png" alt="Cuci Kering" />
         <h2>Cuci Kering</h2>
         <p>Laundry pakaian tanpa setrika. Selesai dalam 2 hari.</p>
         <div class="harga-list">
@@ -29,7 +29,7 @@
 
       <!-- Card 2 -->
       <div class="layanan-card">
-        <img src="assets/cuci-setrika.png" alt="Cuci + Setrika">
+        <img src="assets/cuci-setrika.png" alt="Cuci + Setrika" />
         <h2>Cuci + Setrika</h2>
         <p>Pilih sesuai kebutuhan Anda:</p>
         <ul class="harga-list">
@@ -42,50 +42,74 @@
 
       <!-- Card 3 -->
       <div class="layanan-card">
-        <img src="assets/bedcover.png" alt="Cuci Bedcover">
+        <img src="assets/bedcover.png" alt="Cuci Bedcover" />
         <h2>Cuci Bedcover</h2>
-        <p>Cocok untuk cucian besar seperti bedcover, selimut, dll.</p>
+        <p>Cocok untuk kasur, selimut, atau bedcover besar.</p>
         <div class="harga-list">
-          <div>Mulai Rp25.000 / pcs</div>
+          <div>Rp25.000 / pcs</div>
         </div>
         <a href="order.html" class="btn-order">Pesan Sekarang</a>
       </div>
     </div>
   </main>
 
-  <script>
+  <!-- Navbar Dinamis dengan Firebase Auth -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAg2mhpdg3DH4fJGm2626_2-ysvsXKHRFg",
+      authDomain: "abhista-laundry.firebaseapp.com",
+      projectId: "abhista-laundry",
+      storageBucket: "abhista-laundry.appspot.com",
+      messagingSenderId: "784467467337",
+      appId: "1:784467467337:web:c81cb521dc477b8dc07398"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
     const nav = document.getElementById("main-nav");
-    const isAdmin = localStorage.getItem("admin") === "true";
     const currentPage = window.location.pathname.split("/").pop();
 
-    const menuItems = [
-      { href: "index.html", label: "Beranda" },
-      { href: "layanan.html", label: "Layanan" },
-      { href: "order.html", label: "Order" },
-      { href: "tracking.html", label: "Tracking" },
-      ...(isAdmin
-        ? [
-            { href: "admin-dashboard.html", label: "Dashboard" },
-            { href: "pesanan.html", label: "Pesanan" },
-            { href: "#", label: "Logout", isLogout: true }
-          ]
-        : [{ href: "login.html", label: "Login Admin", isLogin: true }])
-    ];
+    onAuthStateChanged(auth, (user) => {
+      const isAdmin = !!user;
+      const menuItems = [
+        { href: "index.html", label: "Beranda" },
+        { href: "layanan.html", label: "Layanan" },
+        { href: "order.html", label: "Order" },
+        { href: "tracking.html", label: "Tracking" },
+        ...(isAdmin
+          ? [
+              { href: "pesanan.html", label: "Pesanan" },
+              { href: "admin-dashboard.html", label: "Dashboard" },
+              { href: "#", label: "Logout", isLogout: true }
+            ]
+          : [{ href: "login.html", label: "Login Admin", isLogin: true }])
+      ];
 
-    nav.innerHTML = menuItems.map(item => {
-      if (item.isLogout) {
-        return `<a href="#" class="login-button" onclick="logout()">Logout</a>`;
-      }
-      if (item.isLogin) {
-        return `<a href="${item.href}" class="login-button ${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
-      }
-      return `<a href="${item.href}" class="${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
-    }).join("");
+      nav.innerHTML = menuItems
+        .map((item) => {
+          if (item.isLogout) {
+            return `<a href="#" class="login-button" onclick="logout()">Logout</a>`;
+          }
+          if (item.isLogin) {
+            return `<a href="${item.href}" class="login-button ${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
+          }
+          return `<a href="${item.href}" class="${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
+        })
+        .join("");
+    });
 
     function logout() {
-      localStorage.removeItem("admin");
-      alert("Logout berhasil!");
-      window.location.href = "index.html";
+      signOut(auth)
+        .then(() => {
+          alert("Logout berhasil!");
+          window.location.href = "index.html";
+        })
+        .catch((error) => {
+          console.error("Logout error:", error);
+        });
     }
   </script>
 </body>
