@@ -2,9 +2,92 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard Admin - Abhista Laundry</title>
   <link rel="stylesheet" href="css/style.css" />
+  <style>
+    main {
+      padding: 130px 20px 50px; /* "ingetin" biar tidak ketutup navbar */
+    }
+
+    h1 {
+      font-size: 26px;
+      margin-bottom: 30px;
+      color: #4b91f1;
+    }
+
+    .form-card {
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      max-width: 500px;
+      margin: 0 auto 40px;
+    }
+
+    .form-card label {
+      display: block;
+      margin: 12px 0 5px;
+      font-weight: bold;
+    }
+
+    .form-card input,
+    .form-card select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    .form-card button {
+      margin-top: 15px;
+      background-color: #4b91f1;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .form-card button:hover {
+      background-color: #337de4;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      padding: 12px;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+
+    th {
+      background-color: #4b91f1;
+      color: white;
+    }
+
+    tbody tr:hover {
+      background-color: #f2f2f2;
+    }
+
+    .status-select {
+      padding: 5px;
+    }
+
+    .delete-btn {
+      background-color: #ff4d4d;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
   <header class="navbar">
@@ -12,72 +95,54 @@
     <nav id="main-nav"></nav>
   </header>
 
-  <main style="padding: 130px 20px 50px;">
-    <h1>Dashboard Admin</h1>
+  <main>
+    <h1>Dashboard Admin - Tracking Laundry</h1>
 
-    <!-- Kartu Input Tracking -->
-    <section class="tracking-card">
-      <h2>Input Data Tracking</h2>
-      <form id="formTracking">
-        <label>Nama Pelanggan</label>
-        <input type="text" id="nama" required />
+    <div class="form-card">
+      <label>Nama Pelanggan</label>
+      <input type="text" id="nama" required />
 
-        <label>Jenis Layanan</label>
-        <select id="layanan" required>
-          <option value="">-- Pilih Layanan --</option>
-          <option value="Cuci Kering">Cuci Kering</option>
-          <option value="Cuci + Setrika">Cuci + Setrika</option>
-          <option value="Bedcover">Bedcover</option>
-        </select>
+      <label>Jenis Layanan</label>
+      <select id="layanan" required>
+        <option value="Cuci Kering">Cuci Kering</option>
+        <option value="Cuci + Setrika">Cuci + Setrika</option>
+        <option value="Cuci Bedcover">Cuci Bedcover</option>
+      </select>
 
-        <label>Status</label>
-        <select id="status" required>
-          <option value="">-- Pilih Status --</option>
-          <option value="Belum Dijemput">Belum Dijemput</option>
-          <option value="Sudah Dijemput">Sudah Dijemput</option>
-          <option value="Dicuci">Dicuci</option>
-          <option value="Disetrika">Disetrika</option>
-          <option value="Dilipat">Dilipat</option>
-          <option value="Selesai">Selesai</option>
-        </select>
+      <label>Status</label>
+      <select id="status" required>
+        <option value="Belum Dijemput">Belum Dijemput</option>
+        <option value="Sudah Dijemput">Sudah Dijemput</option>
+        <option value="Dicuci">Dicuci</option>
+        <option value="Disetrika">Disetrika</option>
+        <option value="Dilipat">Dilipat</option>
+        <option value="Selesai">Selesai</option>
+      </select>
 
-        <button type="submit" class="btn-order">Tambahkan</button>
-      </form>
-    </section>
+      <label>Harga (Opsional)</label>
+      <input type="number" id="harga" placeholder="cth: 15000" />
 
-    <!-- Daftar Tracking -->
-    <section style="margin-top: 40px;">
-      <h2>Edit Tracking Laundry</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Nama</th>
-            <th>Layanan</th>
-            <th>Status</th>
-            <th>Aksi</th>
-          </tr>
-        </thead>
-        <tbody id="trackingBody"></tbody>
-      </table>
-    </section>
+      <button onclick="tambahTracking()">Tambah Tracking</button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Nama</th>
+          <th>Layanan</th>
+          <th>Status</th>
+          <th>Harga</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="tracking-body"></tbody>
+    </table>
   </main>
 
-  <!-- Firebase + Navbar Script -->
+  <!-- Firebase & Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import {
-      getAuth,
-      onAuthStateChanged,
-      signOut
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import {
-      getDatabase,
-      ref,
-      push,
-      onValue,
-      remove,
-      update
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAg2mhpdg3DH4fJGm2626_2-ysvsXKHRFg",
@@ -90,76 +155,12 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
     const db = getDatabase(app);
-
-    // Navbar Dinamis
-    const nav = document.getElementById("main-nav");
-    const currentPage = window.location.pathname.split("/").pop();
-
-    const renderNavbar = (isLoggedIn) => {
-      const menu = [
-        { href: "index.html", label: "Beranda" },
-        { href: "layanan.html", label: "Layanan" },
-        { href: "order.html", label: "Order" },
-        { href: "tracking.html", label: "Tracking" },
-        ...(isLoggedIn
-          ? [
-              { href: "admin-dashboard.html", label: "Dashboard" },
-              { href: "pesanan.html", label: "Pesanan" },
-              { href: "#", label: "Logout", isLogout: true }
-            ]
-          : [{ href: "login.html", label: "Login Admin", isLogin: true }])
-      ];
-
-      nav.innerHTML = menu
-        .map(item => {
-          if (item.isLogout) {
-            return `<a href="#" class="login-button" onclick="logout()">Logout</a>`;
-          }
-          const active = currentPage === item.href ? 'active' : '';
-          return `<a href="${item.href}" class="${item.isLogin ? 'login-button' : ''} ${active}">${item.label}</a>`;
-        })
-        .join("");
-    };
-
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        renderNavbar(true);
-      } else {
-        renderNavbar(false);
-        // Redirect non-admin
-        if (!window.location.href.includes("login.html")) {
-          window.location.href = "login.html";
-        }
-      }
-    });
-
-    window.logout = () => {
-      signOut(auth).then(() => {
-        alert("Berhasil logout.");
-        window.location.href = "index.html";
-      });
-    };
-
-    // Form Input Tracking
-    const form = document.getElementById("formTracking");
     const trackingRef = ref(db, "tracking");
 
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const data = {
-        nama: form.nama.value,
-        layanan: form.layanan.value,
-        status: form.status.value
-      };
-      push(trackingRef, data).then(() => {
-        form.reset();
-      });
-    });
+    const tbody = document.getElementById("tracking-body");
 
-    // Menampilkan tracking
-    const tbody = document.getElementById("trackingBody");
+    // Menampilkan data tracking
     onValue(trackingRef, (snapshot) => {
       tbody.innerHTML = "";
       const data = snapshot.val();
@@ -175,82 +176,89 @@
                   .map(status => `<option value="${status}" ${item.status === status ? "selected" : ""}>${status}</option>`).join("")}
               </select>
             </td>
-            <td><button onclick="hapusTracking('${id}')">Hapus</button></td>
+            <td>${item.harga || "-"}</td>
+            <td><button class="delete-btn" onclick="hapusTracking('${id}')">Hapus</button></td>
           `;
           tbody.appendChild(row);
-        });
-
-        // Event ubah status
-        document.querySelectorAll(".status-select").forEach(select => {
-          select.addEventListener("change", (e) => {
-            const id = e.target.dataset.id;
-            const newStatus = e.target.value;
-            update(ref(db, "tracking/" + id), { status: newStatus });
-          });
         });
       }
     });
 
+    // Tambah tracking baru
+    window.tambahTracking = function () {
+      const nama = document.getElementById("nama").value.trim();
+      const layanan = document.getElementById("layanan").value;
+      const status = document.getElementById("status").value;
+      const harga = document.getElementById("harga").value;
+
+      if (!nama) return alert("Nama harus diisi.");
+
+      const data = {
+        nama,
+        layanan,
+        status,
+        harga: harga || "-"
+      };
+
+      push(trackingRef, data)
+        .then(() => {
+          document.getElementById("nama").value = "";
+          document.getElementById("harga").value = "";
+        });
+    };
+
+    // Edit status langsung
+    document.addEventListener("change", (e) => {
+      if (e.target.classList.contains("status-select")) {
+        const id = e.target.dataset.id;
+        const newStatus = e.target.value;
+        update(ref(db, "tracking/" + id), { status: newStatus });
+      }
+    });
+
     // Hapus tracking
-    window.hapusTracking = (id) => {
-      if (confirm("Yakin ingin menghapus data ini?")) {
+    window.hapusTracking = function (id) {
+      if (confirm("Yakin ingin menghapus tracking ini?")) {
         remove(ref(db, "tracking/" + id));
       }
     };
   </script>
 
-  <style>
-    .tracking-card {
-      background: #f9f9f9;
-      padding: 20px;
-      border-radius: 10px;
-      max-width: 500px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  <!-- Navbar dinamis -->
+  <script>
+    const nav = document.getElementById("main-nav");
+    const isAdmin = localStorage.getItem("admin") === "true";
+    const currentPage = window.location.pathname.split("/").pop();
+
+    const menuItems = [
+      { href: "index.html", label: "Beranda" },
+      { href: "layanan.html", label: "Layanan" },
+      { href: "order.html", label: "Order" },
+      { href: "tracking.html", label: "Tracking" },
+      ...(isAdmin
+        ? [
+            { href: "admin-dashboard.html", label: "Dashboard" },
+            { href: "pesanan.html", label: "Pesanan" },
+            { href: "#", label: "Logout", isLogout: true }
+          ]
+        : [{ href: "login.html", label: "Login Admin", isLogin: true }])
+    ];
+
+    nav.innerHTML = menuItems.map(item => {
+      if (item.isLogout) {
+        return `<a href="#" class="login-button" onclick="logout()">Logout</a>`;
+      }
+      if (item.isLogin) {
+        return `<a href="${item.href}" class="login-button ${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
+      }
+      return `<a href="${item.href}" class="${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
+    }).join("");
+
+    function logout() {
+      localStorage.removeItem("admin");
+      alert("Logout berhasil!");
+      window.location.href = "index.html";
     }
-    .tracking-card form {
-      display: flex;
-      flex-direction: column;
-    }
-    .tracking-card form label {
-      margin-top: 10px;
-      font-weight: bold;
-    }
-    .tracking-card form input,
-    .tracking-card form select {
-      padding: 8px;
-      margin-top: 5px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-    .tracking-card button {
-      margin-top: 15px;
-      background: #4b91f1;
-      color: white;
-      border: none;
-      padding: 10px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    .tracking-card button:hover {
-      background: #337de4;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-    th, td {
-      padding: 12px;
-      border: 1px solid #ccc;
-    }
-    th {
-      background-color: #4b91f1;
-      color: white;
-    }
-    select.status-select {
-      padding: 6px;
-      border-radius: 4px;
-    }
-  </style>
+  </script>
 </body>
 </html>
