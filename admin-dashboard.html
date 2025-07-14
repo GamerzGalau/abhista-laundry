@@ -2,62 +2,69 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dashboard Admin - Abhista Laundry</title>
   <link rel="stylesheet" href="css/style.css" />
   <style>
     main {
-      padding: 130px 20px 50px; /* "ingetin" biar tidak ketutup navbar */
+      padding: 120px 20px 40px;
+      display: flex;
+      gap: 30px;
+      flex-wrap: wrap;
+      justify-content: center;
     }
 
-    h1 {
-      font-size: 26px;
-      margin-bottom: 30px;
+    .card-tracking {
+      flex: 1;
+      min-width: 300px;
+      max-width: 400px;
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-tracking h2 {
+      font-size: 20px;
+      margin-bottom: 15px;
       color: #4b91f1;
     }
 
-    .form-card {
-      background-color: #ffffff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      max-width: 500px;
-      margin: 0 auto 40px;
-    }
-
-    .form-card label {
+    .card-tracking label {
       display: block;
-      margin: 12px 0 5px;
-      font-weight: bold;
+      margin-top: 10px;
+      font-weight: 600;
     }
 
-    .form-card input,
-    .form-card select {
+    .card-tracking input,
+    .card-tracking select {
       width: 100%;
-      padding: 10px;
-      border-radius: 6px;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 5px;
       border: 1px solid #ccc;
     }
 
-    .form-card button {
+    .card-tracking button {
       margin-top: 15px;
       background-color: #4b91f1;
       color: white;
       border: none;
-      padding: 10px 20px;
+      padding: 10px;
       border-radius: 6px;
-      font-weight: bold;
       cursor: pointer;
+      font-weight: bold;
     }
 
-    .form-card button:hover {
-      background-color: #337de4;
+    .table-wrapper {
+      flex: 2;
+      overflow-x: auto;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
+      margin-top: 0;
     }
 
     th, td {
@@ -71,21 +78,18 @@
       color: white;
     }
 
-    tbody tr:hover {
-      background-color: #f2f2f2;
-    }
-
-    .status-select {
-      padding: 5px;
-    }
-
-    .delete-btn {
-      background-color: #ff4d4d;
+    .action-button {
+      padding: 6px 10px;
+      background-color: #f44336;
       color: white;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 4px;
+      border-radius: 5px;
       cursor: pointer;
+      font-size: 13px;
+    }
+
+    .edit-button {
+      background-color: #4caf50;
+      margin-right: 5px;
     }
   </style>
 </head>
@@ -96,169 +100,59 @@
   </header>
 
   <main>
-    <h1>Dashboard Admin - Tracking Laundry</h1>
+    <!-- Form Tracking -->
+    <div class="card-tracking">
+      <h2>Input Tracking</h2>
+      <form id="trackingForm">
+        <label for="nama">Nama Pelanggan</label>
+        <input type="text" id="nama" required />
 
-    <div class="form-card">
-      <label>Nama Pelanggan</label>
-      <input type="text" id="nama" required />
+        <label for="layanan">Jenis Layanan</label>
+        <select id="layanan" required>
+          <option value="">Pilih Layanan</option>
+          <option value="Cuci Kering">Cuci Kering</option>
+          <option value="Cuci + Setrika">Cuci + Setrika</option>
+          <option value="Bedcover">Cuci Bedcover</option>
+        </select>
 
-      <label>Jenis Layanan</label>
-      <select id="layanan" required>
-        <option value="Cuci Kering">Cuci Kering</option>
-        <option value="Cuci + Setrika">Cuci + Setrika</option>
-        <option value="Cuci Bedcover">Cuci Bedcover</option>
-      </select>
+        <label for="status">Status</label>
+        <select id="status" required>
+          <option value="Belum Dijemput">Belum Dijemput</option>
+          <option value="Sedang Dicuci">Sedang Dicuci</option>
+          <option value="Disetrika">Disetrika</option>
+          <option value="Dilipat">Dilipat</option>
+          <option value="Selesai">Selesai</option>
+        </select>
 
-      <label>Status</label>
-      <select id="status" required>
-        <option value="Belum Dijemput">Belum Dijemput</option>
-        <option value="Sudah Dijemput">Sudah Dijemput</option>
-        <option value="Dicuci">Dicuci</option>
-        <option value="Disetrika">Disetrika</option>
-        <option value="Dilipat">Dilipat</option>
-        <option value="Selesai">Selesai</option>
-      </select>
+        <label for="harga">Harga (Opsional)</label>
+        <input type="text" id="harga" placeholder="Contoh: Rp 10.000" />
 
-      <label>Harga (Opsional)</label>
-      <input type="number" id="harga" placeholder="cth: 15000" />
-
-      <button onclick="tambahTracking()">Tambah Tracking</button>
+        <button type="submit">Tambah Tracking</button>
+      </form>
     </div>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Nama</th>
-          <th>Layanan</th>
-          <th>Status</th>
-          <th>Harga</th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody id="tracking-body"></tbody>
-    </table>
+    <!-- Tabel Tracking -->
+    <div class="table-wrapper">
+      <h2 style="margin-bottom: 10px; color: #4b91f1;">Daftar Tracking</h2>
+      <table id="trackingTable">
+        <thead>
+          <tr>
+            <th>Nama</th>
+            <th>Layanan</th>
+            <th>Status</th>
+            <th>Harga</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Data tracking akan muncul di sini -->
+        </tbody>
+      </table>
+    </div>
   </main>
 
-  <!-- Firebase & Script -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyAg2mhpdg3DH4fJGm2626_2-ysvsXKHRFg",
-      authDomain: "abhista-laundry.firebaseapp.com",
-      databaseURL: "https://abhista-laundry-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "abhista-laundry",
-      storageBucket: "abhista-laundry.appspot.com",
-      messagingSenderId: "784467467337",
-      appId: "1:784467467337:web:c81cb521dc477b8dc07398"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const trackingRef = ref(db, "tracking");
-
-    const tbody = document.getElementById("tracking-body");
-
-    // Menampilkan data tracking
-    onValue(trackingRef, (snapshot) => {
-      tbody.innerHTML = "";
-      const data = snapshot.val();
-      if (data) {
-        Object.entries(data).forEach(([id, item]) => {
-          const row = document.createElement("tr");
-          row.innerHTML = `
-            <td>${item.nama}</td>
-            <td>${item.layanan}</td>
-            <td>
-              <select data-id="${id}" class="status-select">
-                ${["Belum Dijemput", "Sudah Dijemput", "Dicuci", "Disetrika", "Dilipat", "Selesai"]
-                  .map(status => `<option value="${status}" ${item.status === status ? "selected" : ""}>${status}</option>`).join("")}
-              </select>
-            </td>
-            <td>${item.harga || "-"}</td>
-            <td><button class="delete-btn" onclick="hapusTracking('${id}')">Hapus</button></td>
-          `;
-          tbody.appendChild(row);
-        });
-      }
-    });
-
-    // Tambah tracking baru
-    window.tambahTracking = function () {
-      const nama = document.getElementById("nama").value.trim();
-      const layanan = document.getElementById("layanan").value;
-      const status = document.getElementById("status").value;
-      const harga = document.getElementById("harga").value;
-
-      if (!nama) return alert("Nama harus diisi.");
-
-      const data = {
-        nama,
-        layanan,
-        status,
-        harga: harga || "-"
-      };
-
-      push(trackingRef, data)
-        .then(() => {
-          document.getElementById("nama").value = "";
-          document.getElementById("harga").value = "";
-        });
-    };
-
-    // Edit status langsung
-    document.addEventListener("change", (e) => {
-      if (e.target.classList.contains("status-select")) {
-        const id = e.target.dataset.id;
-        const newStatus = e.target.value;
-        update(ref(db, "tracking/" + id), { status: newStatus });
-      }
-    });
-
-    // Hapus tracking
-    window.hapusTracking = function (id) {
-      if (confirm("Yakin ingin menghapus tracking ini?")) {
-        remove(ref(db, "tracking/" + id));
-      }
-    };
-  </script>
-
-  <!-- Navbar dinamis -->
-  <script>
-    const nav = document.getElementById("main-nav");
-    const isAdmin = localStorage.getItem("admin") === "true";
-    const currentPage = window.location.pathname.split("/").pop();
-
-    const menuItems = [
-      { href: "index.html", label: "Beranda" },
-      { href: "layanan.html", label: "Layanan" },
-      { href: "order.html", label: "Order" },
-      { href: "tracking.html", label: "Tracking" },
-      ...(isAdmin
-        ? [
-            { href: "admin-dashboard.html", label: "Dashboard" },
-            { href: "pesanan.html", label: "Pesanan" },
-            { href: "#", label: "Logout", isLogout: true }
-          ]
-        : [{ href: "login.html", label: "Login Admin", isLogin: true }])
-    ];
-
-    nav.innerHTML = menuItems.map(item => {
-      if (item.isLogout) {
-        return `<a href="#" class="login-button" onclick="logout()">Logout</a>`;
-      }
-      if (item.isLogin) {
-        return `<a href="${item.href}" class="login-button ${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
-      }
-      return `<a href="${item.href}" class="${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
-    }).join("");
-
-    function logout() {
-      localStorage.removeItem("admin");
-      alert("Logout berhasil!");
-      window.location.href = "index.html";
-    }
-  </script>
+  <!-- Script Firebase + Dynamic Navbar + Tracking Logic -->
+  <script type="module" src="js/admin-dashboard.js"></script>
+  <script src="js/navbar.js"></script>
 </body>
 </html>
