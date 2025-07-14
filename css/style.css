@@ -314,7 +314,7 @@ h1 {
 
 .radio-group input[type="radio"] {
   vertical-align: middle;
-  transform: translateY(-1px); /* Atur angka ini sesuai posisi */
+  transform: translateY(-3px); /* Atur angka ini sesuai posisi */
 }
 
 .tracking-list {
