@@ -15,6 +15,7 @@
     h1 {
       text-align: center;
       margin-bottom: 30px;
+      color: #4b91f1;
     }
 
     .card-container {
@@ -62,25 +63,14 @@
     </div>
   </main>
 
-    <!-- Navbar Dinamis -->
+  <!-- Navbar Dinamis -->
   <script type="module" src="js/navbar.js"></script>
-  
-  <!-- Firebase Tracking Script -->
+
+  <!-- Tracking Script -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { app } from "./js/firebase-init.js";
     import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAg2mhpdg3DH4fJGm2626_2-ysvsXKHRFg",
-      authDomain: "abhista-laundry.firebaseapp.com",
-      databaseURL: "https://abhista-laundry-default-rtdb.asia-southeast1.firebasedatabase.app/",
-      projectId: "abhista-laundry",
-      storageBucket: "abhista-laundry.appspot.com",
-      messagingSenderId: "784467467337",
-      appId: "1:784467467337:web:c81cb521dc477b8dc07398"
-    };
-
-    const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     const list = document.getElementById("tracking-list");
 
@@ -88,6 +78,7 @@
     onValue(trackingRef, (snapshot) => {
       list.innerHTML = "";
       const data = snapshot.val();
+
       if (data) {
         Object.values(data).forEach(item => {
           const card = document.createElement("div");
@@ -105,6 +96,5 @@
       }
     });
   </script>
-
 </body>
 </html>
