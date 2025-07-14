@@ -5,23 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Abhista Laundry</title>
   <link rel="stylesheet" href="css/style.css" />
+  <style>
+    nav a.active {
+      background-color: #4b91f1;
+      color: white !important;
+      padding: 8px 12px;
+      border-radius: 5px;
+    }
+  </style>
 </head>
 <body>
-  <!-- ✅ Navbar statis -->
-  <header class="navbar">
-    <a href="index.html" class="logo">Abhista Laundry</a>
-    <nav>
-      <a href="index.html">Beranda</a>
-      <a href="layanan.html">Layanan</a>
-      <a href="order.html">Order</a>
-      <a href="tracking.html">Tracking</a>
-      <a href="pesanan.html">Pesanan</a>
-      <a href="admin-dashboard.html">Dashboard</a>
-      <a href="login.html" class="login-button">Login Admin</a>
-    </nav>
-  </header>
+  <!-- Navbar dinamis -->
+  <div id="navbar-placeholder"></div>
 
-  <!-- ✅ Hero / Beranda -->
+  <!-- Hero Section -->
   <main class="background-image">
     <div class="hero-box">
       <h1>Selamat datang di Abhista Laundry</h1>
@@ -29,5 +26,29 @@
       <a href="order.html" class="start-button">Mulai</a>
     </div>
   </main>
+
+  <!-- Script: Navbar Dinamis + Highlight Aktif -->
+  <script>
+    fetch("navbar.html")
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById("navbar-placeholder").innerHTML = data;
+
+        const links = document.querySelectorAll("#main-nav a");
+        const current = window.location.pathname.split("/").pop();
+
+        links.forEach(link => {
+          if (link.getAttribute("href") === current) {
+            link.classList.add("active");
+          }
+        });
+      });
+
+    function logout() {
+      localStorage.removeItem("admin");
+      alert("Logout berhasil!");
+      window.location.href = "index.html";
+    }
+  </script>
 </body>
 </html>
