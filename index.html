@@ -2,57 +2,82 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Abhista Laundry</title>
   <link rel="stylesheet" href="css/style.css" />
-  <style>
-    nav a.active {
-      background-color: #4b91f1;
-      color: white !important;
-      padding: 8px 12px;
-      border-radius: 5px;
-    }
-  </style>
 </head>
 <body>
-  <!-- Navbar dinamis -->
-  <div id="navbar-placeholder"></div>
+  <header class="navbar">
+    <a href="index.html" class="logo">Abhista Laundry</a>
+    <nav id="main-nav"></nav>
+  </header>
 
-  <!-- Hero Section -->
   <main class="background-image">
     <div class="hero-box">
-      <h1>Selamat datang di Abhista Laundry</h1>
-      <p>Kami melayani jasa laundry antar-jemput dengan cepat dan bersih. Yuk, mulai sekarang!</p>
-      <a href="order.html" class="start-button">Mulai</a>
+      <h1>Selamat Datang di Abhista Laundry</h1>
+      <p>Kami melayani jasa laundry antar-jemput cepat, bersih, dan terpercaya.</p>
+      <a href="layanan.html" class="start-button">Mulai</a>
     </div>
   </main>
 
-  <!-- Script: Navbar Dinamis + Highlight Aktif -->
-  <script>
-    fetch("navbar.html")
-      .then(res => res.text())
-      .then(data => {
-        document.getElementById("navbar-placeholder").innerHTML = data;
+  <!-- Script Dinamis Navbar + Firebase Auth -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-        const links = document.querySelectorAll("#main-nav a");
-        const current = window.location.pathname.split("/").pop();
+    const firebaseConfig = {
+      apiKey: "AIzaSyAg2mhpdg3DH4fJGm2626_2-ysvsXKHRFg",
+      authDomain: "abhista-laundry.firebaseapp.com",
+      projectId: "abhista-laundry",
+      storageBucket: "abhista-laundry.appspot.com",
+      messagingSenderId: "784467467337",
+      appId: "1:784467467337:web:c81cb521dc477b8dc07398"
+    };
 
-        links.forEach(link => {
-          if (link.getAttribute("href") === current) {
-            link.classList.add("active");
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const nav = document.getElementById("main-nav");
+    const currentPage = window.location.pathname.split("/").pop();
+
+    onAuthStateChanged(auth, (user) => {
+      const isAdmin = !!user;
+      const menuItems = [
+        { href: "index.html", label: "Beranda" },
+        { href: "layanan.html", label: "Layanan" },
+        { href: "order.html", label: "Order" },
+        { href: "tracking.html", label: "Tracking" },
+        ...(isAdmin
+          ? [
+              { href: "pesanan.html", label: "Pesanan" },
+              { href: "admin-dashboard.html", label: "Dashboard" },
+              { href: "#", label: "Logout", isLogout: true }
+            ]
+          : [{ href: "login.html", label: "Login Admin", isLogin: true }])
+      ];
+
+      nav.innerHTML = menuItems
+        .map((item) => {
+          if (item.isLogout) {
+            return `<a href="#" class="login-button" onclick="logout()">Logout</a>`;
           }
-        });
-      });
+          if (item.isLogin) {
+            return `<a href="${item.href}" class="login-button ${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
+          }
+          return `<a href="${item.href}" class="${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
+        })
+        .join("");
+    });
 
     function logout() {
-      localStorage.removeItem("admin");
-      alert("Logout berhasil!");
-      window.location.href = "index.html";
+      signOut(auth)
+        .then(() => {
+          alert("Logout berhasil!");
+          window.location.href = "index.html";
+        })
+        .catch((error) => {
+          console.error("Logout error:", error);
+        });
     }
   </script>
-  <header class="navbar">
-  <a href="index.html" class="logo">Abhista Laundry</a>
-  <nav id="main-nav"></nav>
-  </header>
 </body>
 </html>
