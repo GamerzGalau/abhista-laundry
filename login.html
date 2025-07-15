@@ -71,38 +71,8 @@
     });
 
     // Navbar Dinamis
-    const nav = document.getElementById("main-nav");
-    const currentPage = window.location.pathname.split("/").pop();
+<script type="module" src="js/navbar.js"></script>
 
-    onAuthStateChanged(auth, (user) => {
-      const isAdmin = !!user;
-      const menuItems = [
-        { href: "index.html", label: "Beranda" },
-        { href: "layanan.html", label: "Layanan" },
-        { href: "order.html", label: "Order" },
-        { href: "tracking.html", label: "Tracking" },
-        ...(isAdmin
-          ? [
-              { href: "pesanan.html", label: "Pesanan" },
-              { href: "admin-dashboard.html", label: "Dashboard" },
-              { href: "#", label: "Logout", isLogout: true }
-            ]
-          : [{ href: "login.html", label: "Login Admin", isLogin: true }]
-        )
-      ];
-
-      nav.innerHTML = menuItems
-        .map((item) => {
-          if (item.isLogout) {
-            return `<a href="#" class="login-button" onclick="logout()">Logout</a>`;
-          }
-          if (item.isLogin) {
-            return `<a href="${item.href}" class="login-button ${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
-          }
-          return `<a href="${item.href}" class="${currentPage === item.href ? 'active' : ''}">${item.label}</a>`;
-        })
-        .join("");
-    });
 
     // Logout
     window.logout = function () {
