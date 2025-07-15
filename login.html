@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <!-- Navbar -->
   <header class="navbar">
     <a href="index.html" class="logo">Abhista Laundry</a>
     <button class="hamburger" id="hamburger">
@@ -18,7 +17,6 @@
     <nav id="main-nav" class="nav-links"></nav>
   </header>
 
-  <!-- Form Login -->
   <main class="order-page">
     <h1 class="order-title">Login Admin</h1>
     <form class="order-form" id="login-form">
@@ -32,17 +30,10 @@
     </form>
   </main>
 
-  <!-- Firebase SDK -->
-<script type="module" src="js/navbar.js"></script>
-  
+  <!-- Script Login -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import {
-      getAuth,
-      signInWithEmailAndPassword,
-      onAuthStateChanged,
-      signOut
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAg2mhpdg3DH4fJGm2626_2-ysvsXKHRFg",
@@ -56,8 +47,8 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // Login Form
-    document.getElementById("login-form").addEventListener("submit", (e) => {
+    const form = document.getElementById("login-form");
+    form.addEventListener("submit", (e) => {
       e.preventDefault();
       const email = document.getElementById("username").value;
       const password = document.getElementById("password").value;
@@ -71,18 +62,9 @@
           alert("Login gagal: " + error.message);
         });
     });
-
-    // Logout
-    window.logout = function () {
-      signOut(auth)
-        .then(() => {
-          alert("Logout berhasil!");
-          window.location.href = "index.html";
-        })
-        .catch((error) => {
-          alert("Gagal logout: " + error.message);
-        });
-    };
   </script>
+
+  <!-- Navbar -->
+  <script type="module" src="js/navbar.js"></script>
 </body>
 </html>
