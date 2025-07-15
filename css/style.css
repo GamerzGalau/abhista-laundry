@@ -50,6 +50,13 @@ nav a {
   transition: 0.3s;
 }
 
+nav.nav-links a.login-button {
+  background-color: #4b91f1;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 5px;
+}
+  
 .login-button {
   background-color: #4b91f1;
   color: white;
