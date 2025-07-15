@@ -33,6 +33,8 @@
   </main>
 
   <!-- Firebase SDK -->
+<script type="module" src="js/navbar.js"></script>
+  
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import {
@@ -69,10 +71,6 @@
           alert("Login gagal: " + error.message);
         });
     });
-
-    // Navbar Dinamis
-<script type="module" src="js/navbar.js"></script>
-
 
     // Logout
     window.logout = function () {
