@@ -132,14 +132,20 @@ a.logo:hover {
 }
 
 .card-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;  /* bikin card center */
   gap: 20px;
-  width: 100%;
-  max-width: 1200px;
-  padding: 0 10px;
+  padding: 30px;
 }
 
+.layanan-page {
+  padding: 130px 20px 50px; /* ingetin */
+  background-color: #f0f4f8;
+  min-height: 100vh;
+  text-align: center;
+}
+  
 .layanan-card {
   display: flex;
   flex-direction: column;
