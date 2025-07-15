@@ -19,7 +19,8 @@ const auth = getAuth(app);
 
 // Target nav
 const nav = document.getElementById("main-nav");
-const currentPage = window.location.pathname.split("/").pop();
+let currentPage = window.location.pathname.split("/").pop();
+if (currentPage === "") currentPage = "index.html";
 
 // Fungsi render menu dinamis
 function renderNavbar(isLoggedIn) {
